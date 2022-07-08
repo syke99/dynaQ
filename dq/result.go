@@ -8,8 +8,12 @@ import (
 	"strings"
 )
 
+type Result struct{}
+
 func UnmarshalResult(result map[string]interface{}, dest interface{}) {
 	resultStruct := dynamicstruct.ExtendStruct(&dest)
+
+	// TODO: build out JSON string for each row so it can be unmarshalled into resultStruct
 	for column, value := range result {
 		valueType := fmt.Sprintf("%v", reflect.TypeOf(value))
 		capitalizedColumn := fmt.Sprintf("%s%s", strings.ToUpper(column[:1]), column[1:])
@@ -35,7 +39,7 @@ func UnmarshalResult(result map[string]interface{}, dest interface{}) {
 	}
 }
 
-func UnmarshalResults(results []map[string]interface{}, dest interface{}) {
+func unmarshalResults(results []map[string]interface{}, dest interface{}) {
 	resultsStruct := dynamicstruct.ExtendStruct(&dest)
 
 	type rs struct {

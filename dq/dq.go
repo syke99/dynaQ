@@ -79,56 +79,119 @@ func (dq Dq) NewDqConn(con *sql.Conn) Dq {
 	return dq
 }
 
-func (dq Dq) DatabaseQuery(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.dbService.Query(dq.db, query, args)
+func (dq Dq) DatabaseQuery(query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.dbService.Query(dq.db, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) DatabaseQueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
 	return dq.dbService.QueryRow(dq.db, query, args)
 }
 
-func (dq Dq) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.dbService.QueryWithContext(dq.db, ctx, query, args)
+func (dq Dq) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.dbService.QueryWithContext(dq.db, ctx, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
 	return dq.dbService.QueryRowWithContext(dq.db, ctx, query, args)
 }
 
-func (dq Dq) PreparedStatementQuery(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.stmntService.Query(dq.stmnt, query, args)
+func (dq Dq) PreparedStatementQuery(query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.stmntService.Query(dq.stmnt, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) PreparedStatementQueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
 	return dq.stmntService.QueryRow(dq.stmnt, query, args)
 }
 
-func (dq Dq) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.stmntService.QueryWithContext(dq.stmnt, ctx, query, args)
+func (dq Dq) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.stmntService.QueryWithContext(dq.stmnt, ctx, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) PreparedStatementQueryRowContext(ctx context.Context, query string) (map[string]interface{}, error) {
 	return dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, query)
 }
 
-func (dq Dq) TransactionQuery(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.txService.Query(dq.tx, query, args)
+func (dq Dq) TransactionQuery(query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.txService.Query(dq.tx, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) TransactionQueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
 	return dq.txService.QueryRow(dq.tx, query, args)
 }
 
-func (dq Dq) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.txService.QueryWithContext(dq.tx, ctx, query, args)
+func (dq Dq) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.txService.QueryWithContext(dq.tx, ctx, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
 	return dq.txService.QueryRowWithContext(dq.tx, ctx, query, args)
 }
 
-func (dq Dq) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.conService.QueryWithContext(dq.conn, ctx, query, args)
+func (dq Dq) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (Result, error) {
+	res := Result{}
+
+	resultsMapSlice, err := dq.conService.QueryWithContext(dq.conn, ctx, query, args)
+	if err != nil {
+		return res, err
+	}
+
+	unmarshalResults(resultsMapSlice, &res)
+
+	return res, nil
 }
 
 func (dq Dq) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
