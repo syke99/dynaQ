@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	dbase "github.com/syke99/go-dq/pkg/db"
 	"github.com/syke99/go-dq/pkg/stmnt"
+	"github.com/syke99/go-dq/pkg/tx"
 )
 
 type Dq struct {
@@ -13,11 +14,13 @@ type Dq struct {
 	stmnt        *sql.Stmt
 	stmntService stmnt.Statement
 	tx           *sql.Tx
+	txService    tx.Transaction
 }
 
 func NewDq(db *sql.DB) Dq {
 	dbService := dbase.NewDbService(db)
 	stmntService := stmnt.NewPreparedStatementService()
+	txService := tx.NewTransactionService()
 
 	return Dq{
 		db:           db,
@@ -25,6 +28,7 @@ func NewDq(db *sql.DB) Dq {
 		stmnt:        &sql.Stmt{},
 		stmntService: stmntService.(stmnt.Statement),
 		tx:           &sql.Tx{},
+		txService:    txService.(tx.Transaction),
 	}
 }
 

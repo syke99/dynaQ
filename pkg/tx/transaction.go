@@ -18,7 +18,7 @@ type service interface {
 	QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
 }
 
-func NewDbService() service {
+func NewTransactionService() service {
 	return Transaction{}
 }
 
