@@ -1,30 +1,30 @@
-package stmnt
+package tx
 
 import (
 	"context"
 	"database/sql"
 
-	"github.com/syke99/dq/internal"
+	"github.com/syke99/dynaQ/dq/internal"
 )
 
-type Statement struct {
-	stmnt *sql.Stmt
+type Transaction struct {
+	tx *sql.Tx
 }
 
 type service interface {
 	Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error)
 	QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
 	QueryRow(query string, queryParams ...interface{}) (map[string]interface{}, error)
-	QueryRowWithContext(ctx context.Context, query string) (map[string]interface{}, error)
+	QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
 }
 
-func NewPreparedStatementService(stmnt *sql.Stmt) service {
-	return Statement{
-		stmnt: stmnt,
+func NewTransactionService(tx *sql.Tx) service {
+	return Transaction{
+		tx: tx,
 	}
 }
 
-func (db Statement) Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
+func (db Transaction) Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
 
 	var results []map[string]interface{}
 
@@ -39,7 +39,7 @@ func (db Statement) Query(query string, queryParams ...interface{}) ([]map[strin
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.stmnt.Query(query, queryParams)
+	res, err := db.tx.Query(query, queryParams)
 	if err != nil {
 		return results, err
 	}
@@ -78,7 +78,7 @@ func (db Statement) Query(query string, queryParams ...interface{}) ([]map[strin
 	return results, nil
 }
 
-func (db Statement) QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
+func (db Transaction) QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
 
 	var results []map[string]interface{}
 
@@ -93,7 +93,7 @@ func (db Statement) QueryWithContext(ctx context.Context, query string, queryPar
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.stmnt.QueryContext(ctx, query, queryParams)
+	res, err := db.tx.QueryContext(ctx, query, queryParams)
 	if err != nil {
 		return results, err
 	}
@@ -132,7 +132,7 @@ func (db Statement) QueryWithContext(ctx context.Context, query string, queryPar
 	return results, nil
 }
 
-func (db Statement) QueryRow(query string, queryParams ...interface{}) (map[string]interface{}, error) {
+func (db Transaction) QueryRow(query string, queryParams ...interface{}) (map[string]interface{}, error) {
 	var columnMap map[string]interface{}
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -144,7 +144,7 @@ func (db Statement) QueryRow(query string, queryParams ...interface{}) (map[stri
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.stmnt.Query(query, queryParams)
+	res, err := db.tx.Query(query, queryParams)
 	if err != nil {
 		return rslt.Columns, err
 	}
@@ -181,7 +181,7 @@ func (db Statement) QueryRow(query string, queryParams ...interface{}) (map[stri
 	return rslt.Columns, nil
 }
 
-func (db Statement) QueryRowWithContext(ctx context.Context, query string) (map[string]interface{}, error) {
+func (db Transaction) QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error) {
 	var columnMap map[string]interface{}
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -193,7 +193,7 @@ func (db Statement) QueryRowWithContext(ctx context.Context, query string) (map[
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.stmnt.QueryContext(ctx, query)
+	res, err := db.tx.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return rslt.Columns, err
 	}

@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	conServ "github.com/syke99/dq/pkg/conn"
-	dbServ "github.com/syke99/dq/pkg/db"
-	stmntServ "github.com/syke99/dq/pkg/stmnt"
-	txserv "github.com/syke99/dq/pkg/tx"
+	conServ "github.com/syke99/dynaQ/dq/pkg/conn"
+	dbServ "github.com/syke99/dynaQ/dq/pkg/db"
+	stmntServ "github.com/syke99/dynaQ/dq/pkg/stmnt"
+	txserv "github.com/syke99/dynaQ/dq/pkg/tx"
 )
 
 type Dq struct {

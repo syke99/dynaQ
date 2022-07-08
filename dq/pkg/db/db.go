@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/syke99/dq/internal"
+	"github.com/syke99/dynaQ/dq/internal"
 )
 
 type DataBase struct {
