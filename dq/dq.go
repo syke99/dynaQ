@@ -12,6 +12,9 @@ import (
 
 type Dq struct {
 	db           *sql.DB
+	stmnt        *sql.Stmt
+	tx           *sql.Tx
+	conn         *sql.Conn
 	dbService    dbServ.DataBase
 	stmntService stmntServ.Statement
 	txService    txserv.Transaction
@@ -19,7 +22,7 @@ type Dq struct {
 }
 
 func NewDq(db *sql.DB) Dq {
-	dbService := dbServ.NewDbService(db)
+	dbService := dbServ.NewDbService()
 
 	return Dq{
 		db:           db,
@@ -36,8 +39,9 @@ func (dq Dq) NewDqPreparedStatement(query string) (Dq, error) {
 		return dq, err
 	}
 
-	stmntService := stmntServ.NewPreparedStatementService(stm)
+	stmntService := stmntServ.NewPreparedStatementService()
 
+	dq.stmnt = stm
 	dq.stmntService = stmntService.(stmntServ.Statement)
 
 	return dq, nil
@@ -49,16 +53,18 @@ func (dq Dq) NewDqPreparedStatementWithContext(ctx context.Context, query string
 		return dq, err
 	}
 
-	stmntService := stmntServ.NewPreparedStatementService(stm)
+	stmntService := stmntServ.NewPreparedStatementService()
 
+	dq.stmnt = stm
 	dq.stmntService = stmntService.(stmntServ.Statement)
 
 	return dq, nil
 }
 
 func (dq Dq) NewDqTransaction(tx *sql.Tx) Dq {
-	txService := txserv.NewTransactionService(tx)
+	txService := txserv.NewTransactionService()
 
+	dq.tx = tx
 	dq.txService = txService.(txserv.Transaction)
 
 	return dq
@@ -67,63 +73,64 @@ func (dq Dq) NewDqTransaction(tx *sql.Tx) Dq {
 func (dq Dq) NewDqConn(con *sql.Conn) Dq {
 	conService := conServ.NewConnectionService(con)
 
+	dq.conn = con
 	dq.conService = conService.(conServ.Connection)
 
 	return dq
 }
 
 func (dq Dq) DatabaseQuery(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.dbService.Query(query, args)
+	return dq.dbService.Query(dq.db, query, args)
 }
 
 func (dq Dq) DatabaseQueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
-	return dq.dbService.QueryRow(query, args)
+	return dq.dbService.QueryRow(dq.db, query, args)
 }
 
 func (dq Dq) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.dbService.QueryWithContext(ctx, query, args)
+	return dq.dbService.QueryWithContext(dq.db, ctx, query, args)
 }
 
 func (dq Dq) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
-	return dq.dbService.QueryRowWithContext(ctx, query, args)
+	return dq.dbService.QueryRowWithContext(dq.db, ctx, query, args)
 }
 
 func (dq Dq) PreparedStatementQuery(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.stmntService.Query(query, args)
+	return dq.stmntService.Query(dq.stmnt, query, args)
 }
 
 func (dq Dq) PreparedStatementQueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
-	return dq.stmntService.QueryRow(query, args)
+	return dq.stmntService.QueryRow(dq.stmnt, query, args)
 }
 
 func (dq Dq) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.stmntService.QueryWithContext(ctx, query, args)
+	return dq.stmntService.QueryWithContext(dq.stmnt, ctx, query, args)
 }
 
 func (dq Dq) PreparedStatementQueryRowContext(ctx context.Context, query string) (map[string]interface{}, error) {
-	return dq.stmntService.QueryRowWithContext(ctx, query)
+	return dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, query)
 }
 
 func (dq Dq) TransactionQuery(query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.txService.Query(query, args)
+	return dq.txService.Query(dq.tx, query, args)
 }
 
 func (dq Dq) TransactionQueryRow(query string, args ...interface{}) (map[string]interface{}, error) {
-	return dq.txService.QueryRow(query, args)
+	return dq.txService.QueryRow(dq.tx, query, args)
 }
 
 func (dq Dq) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.txService.QueryWithContext(ctx, query, args)
+	return dq.txService.QueryWithContext(dq.tx, ctx, query, args)
 }
 
 func (dq Dq) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
-	return dq.txService.QueryRowWithContext(ctx, query, args)
+	return dq.txService.QueryRowWithContext(dq.tx, ctx, query, args)
 }
 
 func (dq Dq) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]interface{}, error) {
-	return dq.conService.QueryWithContext(ctx, query, args)
+	return dq.conService.QueryWithContext(dq.conn, ctx, query, args)
 }
 
 func (dq Dq) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]interface{}, error) {
-	return dq.conService.QueryRowWithContext(ctx, query, args)
+	return dq.conService.QueryRowWithContext(dq.conn, ctx, query, args)
 }

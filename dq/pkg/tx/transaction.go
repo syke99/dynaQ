@@ -7,24 +7,20 @@ import (
 	"github.com/syke99/dynaQ/dq/internal"
 )
 
-type Transaction struct {
-	tx *sql.Tx
-}
+type Transaction struct{}
 
 type service interface {
-	Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error)
-	QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
-	QueryRow(query string, queryParams ...interface{}) (map[string]interface{}, error)
-	QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
+	Query(tx *sql.Tx, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
+	QueryWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
+	QueryRow(tx *sql.Tx, query string, queryParams ...interface{}) (map[string]interface{}, error)
+	QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
 }
 
-func NewTransactionService(tx *sql.Tx) service {
-	return Transaction{
-		tx: tx,
-	}
+func NewTransactionService() service {
+	return Transaction{}
 }
 
-func (db Transaction) Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
+func (db Transaction) Query(tx *sql.Tx, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
 
 	var results []map[string]interface{}
 
@@ -39,7 +35,7 @@ func (db Transaction) Query(query string, queryParams ...interface{}) ([]map[str
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.tx.Query(query, queryParams)
+	res, err := tx.Query(query, queryParams)
 	if err != nil {
 		return results, err
 	}
@@ -78,7 +74,7 @@ func (db Transaction) Query(query string, queryParams ...interface{}) ([]map[str
 	return results, nil
 }
 
-func (db Transaction) QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
+func (db Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
 
 	var results []map[string]interface{}
 
@@ -93,7 +89,7 @@ func (db Transaction) QueryWithContext(ctx context.Context, query string, queryP
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.tx.QueryContext(ctx, query, queryParams)
+	res, err := tx.QueryContext(ctx, query, queryParams)
 	if err != nil {
 		return results, err
 	}
@@ -132,7 +128,7 @@ func (db Transaction) QueryWithContext(ctx context.Context, query string, queryP
 	return results, nil
 }
 
-func (db Transaction) QueryRow(query string, queryParams ...interface{}) (map[string]interface{}, error) {
+func (db Transaction) QueryRow(tx *sql.Tx, query string, queryParams ...interface{}) (map[string]interface{}, error) {
 	var columnMap map[string]interface{}
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -144,7 +140,7 @@ func (db Transaction) QueryRow(query string, queryParams ...interface{}) (map[st
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.tx.Query(query, queryParams)
+	res, err := tx.Query(query, queryParams)
 	if err != nil {
 		return rslt.Columns, err
 	}
@@ -181,7 +177,7 @@ func (db Transaction) QueryRow(query string, queryParams ...interface{}) (map[st
 	return rslt.Columns, nil
 }
 
-func (db Transaction) QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error) {
+func (db Transaction) QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error) {
 	var columnMap map[string]interface{}
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -193,7 +189,7 @@ func (db Transaction) QueryRowWithContext(ctx context.Context, query string, que
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.tx.QueryContext(ctx, query, queryParams...)
+	res, err := tx.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return rslt.Columns, err
 	}

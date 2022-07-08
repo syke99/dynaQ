@@ -7,22 +7,18 @@ import (
 	"github.com/syke99/dynaQ/dq/internal"
 )
 
-type Connection struct {
-	conn *sql.Conn
-}
+type Connection struct{}
 
 type service interface {
-	QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
-	QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
+	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
+	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
 }
 
 func NewConnectionService(conn *sql.Conn) service {
-	return Connection{
-		conn: conn,
-	}
+	return Connection{}
 }
 
-func (db Connection) QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
+func (db Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
 
 	var results []map[string]interface{}
 
@@ -37,7 +33,7 @@ func (db Connection) QueryWithContext(ctx context.Context, query string, queryPa
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.conn.QueryContext(ctx, query, queryParams)
+	res, err := conn.QueryContext(ctx, query, queryParams)
 	if err != nil {
 		return results, err
 	}
@@ -76,7 +72,7 @@ func (db Connection) QueryWithContext(ctx context.Context, query string, queryPa
 	return results, nil
 }
 
-func (db Connection) QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error) {
+func (db Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error) {
 	var columnMap map[string]interface{}
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -88,7 +84,7 @@ func (db Connection) QueryRowWithContext(ctx context.Context, query string, quer
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.conn.QueryContext(ctx, query, queryParams...)
+	res, err := conn.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return rslt.Columns, err
 	}
