@@ -1,10 +1,10 @@
 package dq
 
 import (
+	"context"
 	"database/sql"
-
-	dbase "github.com/syke99/go-dq/db"
-	"github.com/syke99/go-dq/stmnt"
+	dbase "github.com/syke99/go-dq/pkg/db"
+	"github.com/syke99/go-dq/pkg/stmnt"
 )
 
 type Dq struct {
@@ -28,27 +28,27 @@ func NewDq(db *sql.DB) Dq {
 	}
 }
 
-// func (dq Dq) NewPreparedStatement(query string) (Dq, error) {
-// 	stmnt, err := dq.db.Prepare(query)
-// 	if err != nil {
-// 		return dq, err
-// 	}
+func (dq Dq) NewPreparedStatement(query string) (Dq, error) {
+	stm, err := dq.db.Prepare(query)
+	if err != nil {
+		return dq, err
+	}
 
-// 	dq.stmnt = stmnt
+	dq.stmnt = stm
 
-// 	return dq, nil
-// }
+	return dq, nil
+}
 
-// func (dq Dq) NewPreparedStatementWithContext(ctx context.Context, query string) (Dq, error) {
-// 	stmnt, err := dq.db.PrepareContext(ctx, query)
-// 	if err != nil {
-// 		return dq, err
-// 	}
+func (dq Dq) NewPreparedStatementWithContext(ctx context.Context, query string) (Dq, error) {
+	stm, err := dq.db.PrepareContext(ctx, query)
+	if err != nil {
+		return dq, err
+	}
 
-// 	dq.stmnt = stmnt
+	dq.stmnt = stm
 
-// 	return dq, nil
-// }
+	return dq, nil
+}
 
 func (dq Dq) NewTransaction(tx *sql.Tx) Dq {
 	dq.tx = tx
