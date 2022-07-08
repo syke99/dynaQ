@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/syke99/go-dq/internal"
+	"github.com/syke99/dq/internal"
 )
 
 type Statement struct {
@@ -18,8 +18,10 @@ type service interface {
 	QueryRowWithContext(ctx context.Context, query string) (map[string]interface{}, error)
 }
 
-func NewPreparedStatementService() service {
-	return Statement{}
+func NewPreparedStatementService(stmnt *sql.Stmt) service {
+	return Statement{
+		stmnt: stmnt,
+	}
 }
 
 func (db Statement) Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error) {

@@ -3,65 +3,71 @@ package dq
 import (
 	"context"
 	"database/sql"
-	"github.com/syke99/go-dq/pkg/conn"
-	dbase "github.com/syke99/go-dq/pkg/db"
-	"github.com/syke99/go-dq/pkg/stmnt"
-	"github.com/syke99/go-dq/pkg/tx"
+
+	conServ "github.com/syke99/dq/pkg/conn"
+	dbServ "github.com/syke99/dq/pkg/db"
+	stmntServ "github.com/syke99/dq/pkg/stmnt"
+	txserv "github.com/syke99/dq/pkg/tx"
 )
 
 type Dq struct {
 	db           *sql.DB
-	stmnt        *sql.Stmt
-	tx           *sql.Tx
-	con          *sql.Conn
-	dbService    dbase.DataBase
-	stmntService stmnt.Statement
-	txService    tx.Transaction
-	conService   conn.Connection
+	dbService    dbServ.DataBase
+	stmntService stmntServ.Statement
+	txService    txserv.Transaction
+	conService   conServ.Connection
 }
 
 func NewDq(db *sql.DB) Dq {
-	dbService := dbase.NewDbService(db)
-	stmntService := stmnt.NewPreparedStatementService()
-	txService := tx.NewTransactionService()
-	conService := conn.NewConnectionService()
+	dbService := dbServ.NewDbService(db)
 
 	return Dq{
 		db:           db,
-		stmnt:        &sql.Stmt{},
-		tx:           &sql.Tx{},
-		con:          &sql.Conn{},
-		dbService:    dbService.(dbase.DataBase),
-		stmntService: stmntService.(stmnt.Statement),
-		txService:    txService.(tx.Transaction),
-		conService:   conService.(conn.Connection),
+		dbService:    dbService.(dbServ.DataBase),
+		stmntService: stmntServ.Statement{},
+		txService:    txserv.Transaction{},
+		conService:   conServ.Connection{},
 	}
 }
 
-func (dq Dq) NewPreparedStatement(query string) (Dq, error) {
+func (dq Dq) NewDqPreparedStatement(query string) (Dq, error) {
 	stm, err := dq.db.Prepare(query)
 	if err != nil {
 		return dq, err
 	}
 
-	dq.stmnt = stm
+	stmntService := stmntServ.NewPreparedStatementService(stm)
+
+	dq.stmntService = stmntService.(stmntServ.Statement)
 
 	return dq, nil
 }
 
-func (dq Dq) NewPreparedStatementWithContext(ctx context.Context, query string) (Dq, error) {
+func (dq Dq) NewDqPreparedStatementWithContext(ctx context.Context, query string) (Dq, error) {
 	stm, err := dq.db.PrepareContext(ctx, query)
 	if err != nil {
 		return dq, err
 	}
 
-	dq.stmnt = stm
+	stmntService := stmntServ.NewPreparedStatementService(stm)
+
+	dq.stmntService = stmntService.(stmntServ.Statement)
 
 	return dq, nil
 }
 
-func (dq Dq) NewTransaction(tx *sql.Tx) Dq {
-	dq.tx = tx
+func (dq Dq) NewDqTransaction(tx *sql.Tx) Dq {
+	txService := txserv.NewTransactionService(tx)
+
+	dq.txService = txService.(txserv.Transaction)
+
+	return dq
+}
+
+func (dq Dq) NewDqConn(con *sql.Conn) Dq {
+	conService := conServ.NewConnectionService(con)
+
+	dq.conService = conService.(conServ.Connection)
 
 	return dq
 }

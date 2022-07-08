@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/syke99/go-dq/internal"
+	"github.com/syke99/dq/internal"
 )
 
 type Transaction struct {
@@ -18,8 +18,10 @@ type service interface {
 	QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
 }
 
-func NewTransactionService() service {
-	return Transaction{}
+func NewTransactionService(tx *sql.Tx) service {
+	return Transaction{
+		tx: tx,
+	}
 }
 
 func (db Transaction) Query(query string, queryParams ...interface{}) ([]map[string]interface{}, error) {

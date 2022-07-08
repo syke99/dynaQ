@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/syke99/go-dq/internal"
+	"github.com/syke99/dq/internal"
 )
 
 type DataBase struct {

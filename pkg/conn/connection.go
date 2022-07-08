@@ -3,11 +3,12 @@ package conn
 import (
 	"context"
 	"database/sql"
-	"github.com/syke99/go-dq/internal"
+
+	"github.com/syke99/dq/internal"
 )
 
 type Connection struct {
-	db *sql.Conn
+	conn *sql.Conn
 }
 
 type service interface {
@@ -15,8 +16,10 @@ type service interface {
 	QueryRowWithContext(ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
 }
 
-func NewConnectionService() service {
-	return Connection{}
+func NewConnectionService(conn *sql.Conn) service {
+	return Connection{
+		conn: conn,
+	}
 }
 
 func (db Connection) QueryWithContext(ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
@@ -34,7 +37,7 @@ func (db Connection) QueryWithContext(ctx context.Context, query string, queryPa
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.db.QueryContext(ctx, query, queryParams)
+	res, err := db.conn.QueryContext(ctx, query, queryParams)
 	if err != nil {
 		return results, err
 	}
@@ -85,7 +88,7 @@ func (db Connection) QueryRowWithContext(ctx context.Context, query string, quer
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := db.db.QueryContext(ctx, query, queryParams...)
+	res, err := db.conn.QueryContext(ctx, query, queryParams...)
 	if err != nil {
 		return rslt.Columns, err
 	}
