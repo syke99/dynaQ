@@ -59,7 +59,10 @@ func (db Transaction) Query(query string, queryParams ...interface{}) ([]map[str
 
 	for res.Next() {
 		// scans all values into a slice of interfaces of any size
-		res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues)
+		if err != nil {
+			return results, err
+		}
 
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range rslt.ColumnValues {
@@ -110,7 +113,10 @@ func (db Transaction) QueryWithContext(ctx context.Context, query string, queryP
 
 	for res.Next() {
 		// scans all values into a slice of interfaces of any size
-		res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues)
+		if err != nil {
+			return results, err
+		}
 
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range rslt.ColumnValues {
@@ -158,7 +164,10 @@ func (db Transaction) QueryRow(query string, queryParams ...interface{}) (map[st
 
 	if res.Next() {
 		// scans all values into a slice of interfaces of any size
-		res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues)
+		if err != nil {
+			return rslt.Columns, err
+		}
 
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range rslt.ColumnValues {
@@ -202,7 +211,10 @@ func (db Transaction) QueryRowWithContext(ctx context.Context, query string, que
 
 	if res.Next() {
 		// scans all values into a slice of interfaces of any size
-		res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues)
+		if err != nil {
+			return rslt.Columns, err
+		}
 
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range rslt.ColumnValues {
