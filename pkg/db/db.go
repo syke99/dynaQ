@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/syke99/dynaQ/dq/internal"
+	"github.com/syke99/dynaQ/internal"
 )
 
 type DataBase struct{}
@@ -57,7 +57,7 @@ func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}
 
 	for res.Next() {
 		// scans all values into a slice of interfaces of any size
-		err := res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues...)
 		if err != nil {
 			return results, err
 		}
@@ -111,7 +111,7 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 
 	for res.Next() {
 		// scans all values into a slice of interfaces of any size
-		err := res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues...)
 		if err != nil {
 			return results, err
 		}
@@ -162,7 +162,7 @@ func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interfac
 
 	if res.Next() {
 		// scans all values into a slice of interfaces of any size
-		err := res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues...)
 		if err != nil {
 			return rslt.Columns, err
 		}
@@ -209,7 +209,7 @@ func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query
 
 	if res.Next() {
 		// scans all values into a slice of interfaces of any size
-		err := res.Scan(rslt.ColumnValues)
+		err := res.Scan(rslt.ColumnValues...)
 		if err != nil {
 			return rslt.Columns, err
 		}
