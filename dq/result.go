@@ -36,7 +36,7 @@ func UnmarshalResult(result map[string]interface{}, dest interface{}) {
 }
 
 func UnmarshalResults(results []map[string]interface{}, dest interface{}) {
-	// resultsStruct := dynamicstruct.ExtendStruct(&dest)
+	resultsStruct := dynamicstruct.ExtendStruct(&dest)
 
 	type rs struct {
 		rslts     []dynamicstruct.Builder
@@ -90,25 +90,48 @@ func UnmarshalResults(results []map[string]interface{}, dest interface{}) {
 		// then add the closing brace
 		rowJson = fmt.Sprintf("%s}", rowJson)
 
-		// convert the row's data to bytes
+		// convert the rows' data to bytes
 		rowData := []byte(rowJson)
 
 		res.rslts = append(res.rslts, resultStruct)
 		res.rsltsData = append(res.rsltsData, rowData)
 	}
 
-	var resultsSlice []interface{}
-	var resultsSliceData [][]byte
+	var resultsSlice []string
 
 	for i, result := range res.rslts {
-		r := result.Build().New()
+		r := result.
+			Build().
+			New()
 
 		_ = json.Unmarshal(res.rsltsData[i], &r)
 		data, _ := json.Marshal(r)
 
-		resultsSlice = append(resultsSlice, r)
-		resultsSliceData = append(resultsSliceData, data)
+		resultsSlice = append(resultsSlice, string(data))
+	}
+	resultsJson := "{"
+	for i, resultString := range resultsSlice {
+		resultNumberString := fmt.Sprintf("result-%d", i)
+		capitalizedResultNumberString := fmt.Sprintf("%s%s", strings.ToUpper(resultNumberString[:1]), resultNumberString[1:])
+
+		resultsStruct.
+			AddField(capitalizedResultNumberString, "", resultNumberString)
+
+		resultsJson = fmt.Sprintf("%s,\"%s\": \"%s\",", resultsJson, resultNumberString, resultString)
 	}
 
-	// TODO: loop through resultsSlice and create json to unmarshall until &dest with the corresponding value in resultsSliceData
+	// after all results are added, remove the trailing comma
+	resultsJson = resultsJson[:len(resultsJson)-1]
+
+	// then add the closing brace
+	resultsJson = fmt.Sprintf("%s}", resultsJson)
+
+	// convert the results' data to bytes
+	rowData := []byte(resultsJson)
+
+	resultsStruct.
+		Build().
+		New()
+
+	_ = json.Unmarshal(rowData, resultsStruct)
 }
