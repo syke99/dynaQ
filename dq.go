@@ -3,6 +3,7 @@ package dq
 import (
 	"context"
 	"database/sql"
+	"github.com/syke99/go-dq/pkg/conn"
 	dbase "github.com/syke99/go-dq/pkg/db"
 	"github.com/syke99/go-dq/pkg/stmnt"
 	"github.com/syke99/go-dq/pkg/tx"
@@ -10,25 +11,30 @@ import (
 
 type Dq struct {
 	db           *sql.DB
-	dbService    dbase.DataBase
 	stmnt        *sql.Stmt
-	stmntService stmnt.Statement
 	tx           *sql.Tx
+	con          *sql.Conn
+	dbService    dbase.DataBase
+	stmntService stmnt.Statement
 	txService    tx.Transaction
+	conService   conn.Connection
 }
 
 func NewDq(db *sql.DB) Dq {
 	dbService := dbase.NewDbService(db)
 	stmntService := stmnt.NewPreparedStatementService()
 	txService := tx.NewTransactionService()
+	conService := conn.NewConnectionService()
 
 	return Dq{
 		db:           db,
-		dbService:    dbService.(dbase.DataBase),
 		stmnt:        &sql.Stmt{},
-		stmntService: stmntService.(stmnt.Statement),
 		tx:           &sql.Tx{},
+		con:          &sql.Conn{},
+		dbService:    dbService.(dbase.DataBase),
+		stmntService: stmntService.(stmnt.Statement),
 		txService:    txService.(tx.Transaction),
+		conService:   conService.(conn.Connection),
 	}
 }
 
