@@ -10,7 +10,7 @@ import (
 	txserv "github.com/syke99/dynaQ/pkg/tx"
 )
 
-type Dq struct {
+type DynaQ struct {
 	db           *sql.DB
 	stmnt        *sql.Stmt
 	tx           *sql.Tx
@@ -22,7 +22,7 @@ type Dq struct {
 	conService   conServ.Connection
 }
 
-func NewDq(db *sql.DB, timeFormat string) Dq {
+func NewDynaQ(db *sql.DB, timeFormat string) DynaQ {
 	dbService := dbServ.NewDbService()
 	var tmFmt string
 
@@ -32,7 +32,7 @@ func NewDq(db *sql.DB, timeFormat string) Dq {
 		tmFmt = timeFormat
 	}
 
-	return Dq{
+	return DynaQ{
 		db:           db,
 		timeFormat:   tmFmt,
 		dbService:    dbService.(dbServ.DataBase),
@@ -42,7 +42,7 @@ func NewDq(db *sql.DB, timeFormat string) Dq {
 	}
 }
 
-func (dq Dq) NewDqPreparedStatement(query string) (Dq, error) {
+func (dq DynaQ) NewDqPreparedStatement(query string) (DynaQ, error) {
 	stm, err := dq.db.Prepare(query)
 	if err != nil {
 		return dq, err
@@ -56,7 +56,7 @@ func (dq Dq) NewDqPreparedStatement(query string) (Dq, error) {
 	return dq, nil
 }
 
-func (dq Dq) NewDqPreparedStatementWithContext(ctx context.Context, query string) (Dq, error) {
+func (dq DynaQ) NewDqPreparedStatementWithContext(ctx context.Context, query string) (DynaQ, error) {
 	stm, err := dq.db.PrepareContext(ctx, query)
 	if err != nil {
 		return dq, err
@@ -70,7 +70,7 @@ func (dq Dq) NewDqPreparedStatementWithContext(ctx context.Context, query string
 	return dq, nil
 }
 
-func (dq Dq) NewDqTransaction(tx *sql.Tx) Dq {
+func (dq DynaQ) NewDqTransaction(tx *sql.Tx) DynaQ {
 	txService := txserv.NewTransactionService()
 
 	dq.tx = tx
@@ -79,7 +79,7 @@ func (dq Dq) NewDqTransaction(tx *sql.Tx) Dq {
 	return dq
 }
 
-func (dq Dq) NewDqConn(con *sql.Conn) Dq {
+func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
 	conService := conServ.NewConnectionService(con)
 
 	dq.conn = con
@@ -88,58 +88,58 @@ func (dq Dq) NewDqConn(con *sql.Conn) Dq {
 	return dq
 }
 
-func (dq Dq) DatabaseQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.dbService.Query(dq.db, query, dq.timeFormat, args)
 }
 
-func (dq Dq) DatabaseQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
+func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
 	return dq.dbService.QueryRow(dq.db, query, dq.timeFormat, args)
 }
 
-func (dq Dq) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.dbService.QueryWithContext(dq.db, ctx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
+func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
 	return dq.dbService.QueryRowWithContext(dq.db, ctx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) PreparedStatementQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) PreparedStatementQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.stmntService.Query(dq.stmnt, query, dq.timeFormat, args)
 }
 
-func (dq Dq) PreparedStatementQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
+func (dq DynaQ) PreparedStatementQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
 	return dq.stmntService.QueryRow(dq.stmnt, query, dq.timeFormat, args)
 }
 
-func (dq Dq) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.stmntService.QueryWithContext(dq.stmnt, ctx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) PreparedStatementQueryRowContext(ctx context.Context, query string) (map[string]models.QueryValue, error) {
+func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context, query string) (map[string]models.QueryValue, error) {
 	return dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, query, dq.timeFormat)
 }
 
-func (dq Dq) TransactionQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) TransactionQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.txService.Query(dq.tx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) TransactionQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
+func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
 	return dq.txService.QueryRow(dq.tx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.txService.QueryWithContext(dq.tx, ctx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
+func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
 	return dq.txService.QueryRowWithContext(dq.tx, ctx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
+func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
 	return dq.conService.QueryWithContext(dq.conn, ctx, query, dq.timeFormat, args)
 }
 
-func (dq Dq) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
+func (dq DynaQ) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
 	return dq.conService.QueryRowWithContext(dq.conn, ctx, query, dq.timeFormat, args)
 }
