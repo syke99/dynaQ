@@ -1,6 +1,6 @@
 package models
 
 type QueryValue struct {
-	Type  string
-	Value interface{}
+	Type  string      `json:"type"`
+	Value interface{} `json:"value"`
 }
