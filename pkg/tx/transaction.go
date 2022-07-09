@@ -107,7 +107,7 @@ func (t Transaction) QueryRow(tx *sql.Tx, query string, timeFormat string, query
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, columnTypesSlice, timeFormat)
 	if err != nil {
 		return rslt.Columns, err
 	}
@@ -136,7 +136,7 @@ func (t Transaction) QueryRowWithContext(tx *sql.Tx, ctx context.Context, query 
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, columnTypesSlice, timeFormat)
 	if err != nil {
 		return rslt.Columns, err
 	}

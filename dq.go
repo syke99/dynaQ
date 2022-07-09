@@ -7,6 +7,7 @@ import (
 	dbServ "github.com/syke99/dynaQ/pkg/db"
 	"github.com/syke99/dynaQ/pkg/models"
 	stmntServ "github.com/syke99/dynaQ/pkg/stmnt"
+	"github.com/syke99/dynaQ/pkg/timeFmt"
 	txserv "github.com/syke99/dynaQ/pkg/tx"
 )
 
@@ -27,7 +28,7 @@ func NewDynaQ(db *sql.DB, timeFormat string) DynaQ {
 	var tmFmt string
 
 	if timeFormat == "" {
-		tmFmt = DefaultTimeFormat
+		tmFmt = timeFmt.DefaultTimeFormat
 	} else {
 		tmFmt = timeFormat
 	}

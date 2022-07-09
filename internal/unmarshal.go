@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) (map[string]models.QueryValue, error) {
+func UnmarshalRow(res *models.Result, rows *sql.Rows, columnTypesSlice []string, timeFormat string) (map[string]models.QueryValue, error) {
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
 
@@ -43,9 +43,33 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) (map[st
 
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range res.ColumnValues {
+			if (i + 1) <= len(res.ColumnValues) {
+				colType := ""
+
+				colType = evalType(colType, value)
+
+				switch colType {
+				case "int", "int8", "int16", "int32", "int64":
+				case "uint", "uint8", "uint16", "uint32", "uint64":
+					colType = "int64"
+				case "float32", "float64":
+					colType = "float64"
+				case "bool":
+				case "string":
+					valString := fmt.Sprintf("%v", reflect.ValueOf(value))
+					_, err := time.Parse(timeFormat, valString)
+					if err != nil {
+						colType = "time.Time"
+					}
+				case "slice":
+					colType = "[]byte"
+				}
+				columnTypesSlice[i] = colType
+			}
 			currentColumnName := res.ColumnNames[i]
+			currentColumnType := columnTypesSlice[i]
 			qr := models.QueryValue{
-				Type:  fmt.Sprintf("%v", reflect.ValueOf(&value).Kind()),
+				Type:  currentColumnType,
 				Value: value,
 			}
 			res.Columns[currentColumnName] = qr
@@ -95,13 +119,25 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string
 		// rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range res.ColumnValues {
 			if (i + 1) <= len(res.ColumnValues) {
-				colType := fmt.Sprintf("%v", reflect.ValueOf(&value).Kind())
-				if colType == "string" {
+				colType := ""
+
+				colType = evalType(colType, value)
+
+				switch colType {
+				case "int", "int8", "int16", "int32", "int64":
+				case "uint", "uint8", "uint16", "uint32", "uint64":
+					colType = "int64"
+				case "float32", "float64":
+					colType = "float64"
+				case "bool":
+				case "string":
 					valString := fmt.Sprintf("%v", reflect.ValueOf(value))
 					_, err := time.Parse(timeFormat, valString)
 					if err != nil {
 						colType = "time.Time"
 					}
+				case "slice":
+					colType = "[]byte"
 				}
 				columnTypesSlice[i] = colType
 			}
@@ -118,4 +154,20 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string
 	}
 
 	return results, nil
+}
+
+func evalType(colType string, value interface{}) string {
+	colTypeReflectKind := reflect.Value{}.Kind()
+	defer func(colType *string) {
+		if r := recover(); r != nil {
+			nilVal := "nil"
+			colType = &nilVal
+		}
+	}(&colType)
+
+	colTypeReflectKind = reflect.ValueOf(&value).Kind()
+
+	colType = fmt.Sprintf("%v", colTypeReflectKind)
+
+	return colType
 }

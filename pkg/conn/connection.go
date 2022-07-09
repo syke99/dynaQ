@@ -72,7 +72,7 @@ func (c Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, que
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, columnTypesSlice, timeFormat)
 	if err != nil {
 		return rslt.Columns, err
 	}
