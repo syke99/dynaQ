@@ -4,31 +4,31 @@ import (
 	"context"
 	"database/sql"
 	"github.com/syke99/dynaQ/internal"
-	"github.com/syke99/dynaQ/models"
+	models2 "github.com/syke99/dynaQ/pkg/models"
 )
 
 type DataBase struct{}
 
 type service interface {
-	Query(db *sql.DB, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryWithContext(db *sql.DB, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryRow(db *sql.DB, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
-	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
+	Query(db *sql.DB, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error)
+	QueryWithContext(db *sql.DB, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error)
+	QueryRow(db *sql.DB, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error)
+	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error)
 }
 
 func NewDbService() service {
 	return DataBase{}
 }
 
-func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
+func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error) {
+	var results []map[string]models2.QueryValue
 
-	var columnMap map[string]models.QueryValue
+	var columnMap map[string]models2.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models.Result{
+	rslt := models2.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
@@ -44,7 +44,7 @@ func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}
 	defer res.Close()
 
 	if err != nil {
-		var dummyResults []map[string]models.QueryValue
+		var dummyResults []map[string]models2.QueryValue
 
 		return dummyResults, err
 	}
@@ -53,7 +53,7 @@ func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}
 
 	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
 	if err != nil {
-		var dummyResults []map[string]models.QueryValue
+		var dummyResults []map[string]models2.QueryValue
 
 		return dummyResults, err
 	}
@@ -61,15 +61,15 @@ func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
+func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error) {
+	var results []map[string]models2.QueryValue
 
-	var columnMap map[string]models.QueryValue
+	var columnMap map[string]models2.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models.Result{
+	rslt := models2.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
@@ -85,7 +85,7 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 	defer res.Close()
 
 	if err != nil {
-		var dummyResults []map[string]models.QueryValue
+		var dummyResults []map[string]models2.QueryValue
 
 		return dummyResults, err
 	}
@@ -94,7 +94,7 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 
 	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
 	if err != nil {
-		var dummyResults []map[string]models.QueryValue
+		var dummyResults []map[string]models2.QueryValue
 
 		return dummyResults, err
 	}
@@ -102,13 +102,13 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
-	var columnMap map[string]models.QueryValue
+func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error) {
+	var columnMap map[string]models2.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models.Result{
+	rslt := models2.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
@@ -131,13 +131,13 @@ func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interfac
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
-	var columnMap map[string]models.QueryValue
+func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error) {
+	var columnMap map[string]models2.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models.Result{
+	rslt := models2.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
