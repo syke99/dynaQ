@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func UnmarshalRow(res *models.Result, rows *sql.Rows, columnTypesSlice []string, timeFormat string) (map[string]models.QueryValue, error) {
+func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.QueryValue, error) {
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
 
@@ -17,6 +17,20 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, columnTypesSlice []string,
 
 	// make a dummy Result to correctly initialize Columns
 	dummyRes := models.QueryValue{}
+
+	count := len(columnNames)
+	colNames := make(map[string]models.QueryValue, count)
+	values := make([]interface{}, count)
+	valuePointers := make([]interface{}, count)
+
+	columnValuesSlice := make([]interface{}, count)
+	columnNamesSlice := make([]string, count)
+	columnTypesSlice := make([]string, count)
+
+	res.Columns = colNames
+	res.ColumnValues = columnValuesSlice
+	res.ColumnNames = columnNamesSlice
+	res.ColumnTypes = columnTypesSlice
 
 	// this will keep the column names and column values synchronized to make assigning map entry values a breeze
 	for i, columnName := range columnNames {
@@ -27,60 +41,56 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, columnTypesSlice []string,
 		// index
 		res.ColumnTypes = append(res.ColumnTypes, "")
 		res.ColumnNames = append(res.ColumnNames, "")
-		res.ColumnValues = append(res.ColumnValues, dummyColumnValue)
+		res.ColumnValues = append(res.ColumnValues, &dummyColumnValue)
 
 		res.ColumnTypes[i] = ""
 		res.ColumnNames[i] = columnName
 		res.Columns[columnName] = dummyRes
 	}
 
+	rowResults := make([]models.QueryValue, count)
+
 	if rows.Next() {
+		for i := range columnNames {
+			res.ColumnNames[i] = columnNames[i]
+			valuePointers[i] = &values[i]
+		}
 		// scans all values into a slice of interfaces of any size
 		err := rows.Scan(res.ColumnValues)
 		if err != nil {
-			return res.Columns, err
+			return rowResults, err
 		}
 
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
-		for i, value := range res.ColumnValues {
-			if (i + 1) <= len(res.ColumnValues) {
-				colType := ""
-
-				colType = evalType(colType, value)
-
-				switch colType {
-				case "int", "int8", "int16", "int32", "int64":
-				case "uint", "uint8", "uint16", "uint32", "uint64":
-					colType = "int64"
-				case "float32", "float64":
-					colType = "float64"
-				case "bool":
-				case "string":
-					valString := fmt.Sprintf("%v", reflect.ValueOf(value))
-					_, err := time.Parse(timeFormat, valString)
+		for i, _ := range valuePointers {
+			colVal := evalVal(values[i])
+			if i < len(valuePointers) {
+				colType := evalType(values[i])
+				if colType == "string" {
+					_, err := time.Parse(timeFormat, colVal)
 					if err != nil {
 						colType = "time.Time"
 					}
-				case "slice":
-					colType = "[]byte"
 				}
 				columnTypesSlice[i] = colType
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
 			qr := models.QueryValue{
-				Type:  currentColumnType,
-				Value: value,
+				Type:   currentColumnType,
+				Column: currentColumnName,
+				Value:  colVal,
 			}
-			res.Columns[currentColumnName] = qr
+
+			rowResults[i] = qr
 		}
 	}
 
-	return res.Columns, nil
+	return rowResults, nil
 }
 
-func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string, timeFormat string) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
+func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]models.QueryValue, error) {
+	var results [][]models.QueryValue
 
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
@@ -91,6 +101,20 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string
 	// make a dummy Result to correctly initialize Columns
 	dummyRes := models.QueryValue{}
 
+	count := len(columnNames)
+	colNames := make(map[string]models.QueryValue, count)
+	values := make([]interface{}, count)
+	valuePointers := make([]interface{}, count)
+
+	columnValuesSlice := make([]interface{}, count)
+	columnNamesSlice := make([]string, count)
+	columnTypesSlice := make([]string, count)
+
+	res.Columns = colNames
+	res.ColumnValues = columnValuesSlice
+	res.ColumnNames = columnNamesSlice
+	res.ColumnTypes = columnTypesSlice
+
 	// this will keep the column names and column values synchronized to make assigning map entry values a breeze
 	for i, columnName := range columnNames {
 		// append an empty value to the slices so that
@@ -100,7 +124,7 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string
 		// index
 		res.ColumnTypes = append(res.ColumnTypes, "")
 		res.ColumnNames = append(res.ColumnNames, "")
-		res.ColumnValues = append(res.ColumnValues, dummyColumnValue)
+		res.ColumnValues = append(res.ColumnValues, &dummyColumnValue)
 
 		res.ColumnTypes[i] = ""
 		res.ColumnNames[i] = columnName
@@ -108,66 +132,77 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string
 	}
 
 	for rows.Next() {
+		for i := range columnNames {
+			res.ColumnNames[i] = columnNames[i]
+			valuePointers[i] = &values[i]
+		}
 		// scans all values into a slice of interfaces of any size
-		err := rows.Scan(res.ColumnValues...)
+		err := rows.Scan(valuePointers...)
 		if err != nil {
 			return results, err
 		}
 
+		rowResults := make([]models.QueryValue, count)
+
 		// loop through the columnValues and assign them to the correct
 		// map entry in rslt.columns using the index of the value in
 		// rslt.columnValues, which was synchronized with rslt.columnNames above
-		for i, value := range res.ColumnValues {
-			if (i + 1) <= len(res.ColumnValues) {
-				colType := ""
+		for i, _ := range valuePointers {
+			colVal := evalVal(values[i])
+			if i < len(valuePointers) {
+				colType := evalType(values[i])
 
-				colType = evalType(colType, value)
-
-				switch colType {
-				case "int", "int8", "int16", "int32", "int64":
-				case "uint", "uint8", "uint16", "uint32", "uint64":
-					colType = "int64"
-				case "float32", "float64":
-					colType = "float64"
-				case "bool":
-				case "string":
-					valString := fmt.Sprintf("%v", reflect.ValueOf(value))
-					_, err := time.Parse(timeFormat, valString)
-					if err != nil {
-						colType = "time.Time"
-					}
-				case "slice":
-					colType = "[]byte"
-				}
 				columnTypesSlice[i] = colType
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
-			qr := models.QueryValue{
-				Type:  currentColumnType,
-				Value: value,
+
+			// TODO: figure out why colVal that holds a date isn't parsing with matching formats
+			if currentColumnType == "string" {
+				_, err := time.Parse(timeFormat, colVal)
+				if err != nil {
+					println(err.Error())
+					columnTypesSlice[i] = "string"
+				} else {
+					columnTypesSlice[i] = "time.Time"
+				}
 			}
-			res.Columns[currentColumnName] = qr
+
+			currentColumnType = columnTypesSlice[i]
+
+			qr := models.QueryValue{
+				Type:   currentColumnType,
+				Column: currentColumnName,
+				Value:  colVal,
+			}
+
+			rowResults[i] = qr
 		}
 
-		results = append(results, res.Columns)
+		results = append(results, rowResults)
 	}
 
 	return results, nil
 }
 
-func evalType(colType string, value interface{}) string {
-	colTypeReflectKind := reflect.Value{}.Kind()
-	defer func(colType *string) {
-		if r := recover(); r != nil {
-			nilVal := "nil"
-			colType = &nilVal
-		}
-	}(&colType)
+func evalType(value interface{}) string {
+	test := reflect.ValueOf(value)
 
-	colTypeReflectKind = reflect.ValueOf(&value).Kind()
+	pointsTo := reflect.Indirect(test)
 
-	colType = fmt.Sprintf("%v", colTypeReflectKind)
+	cType := fmt.Sprintf("%v", pointsTo.Type())
 
-	return colType
+	if cType == "[]uint8" {
+		return "[]byte"
+	}
+
+	return cType
+}
+
+func evalVal(value interface{}) string {
+	test := reflect.ValueOf(value)
+
+	pointsTo := reflect.Indirect(test)
+
+	return fmt.Sprintf("%v", pointsTo)
 }

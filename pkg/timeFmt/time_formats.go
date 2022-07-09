@@ -1,7 +1,7 @@
 package timeFmt
 
 const (
-	DefaultTimeFormat = "2006-01-02T15:04:05.999Z"
+	DefaultTimeFormat = "2006-01-02T15:04:05.000000Z"
 	DATEw             = "28-oct-90"             // dd-mmm-yy
 	DATEwl            = "28-oct-1990"           // dd-mmm-yyyy
 	ADATEw            = "10/28/90"              // mm/dd/yy
