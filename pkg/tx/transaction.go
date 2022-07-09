@@ -21,8 +21,6 @@ func NewTransactionService() service {
 }
 
 func (t Transaction) Query(tx *sql.Tx, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
-
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -37,12 +35,6 @@ func (t Transaction) Query(tx *sql.Tx, query string, timeFormat string, queryPar
 
 	// query the db with the dynamic query and it’s params
 	res, err := tx.Query(query, queryParams)
-	if err != nil {
-		return results, err
-	}
-
-	defer res.Close()
-
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 

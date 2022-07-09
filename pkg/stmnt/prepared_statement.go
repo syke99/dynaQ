@@ -21,8 +21,6 @@ func NewPreparedStatementService() service {
 }
 
 func (s Statement) Query(stm *sql.Stmt, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
-
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -37,12 +35,6 @@ func (s Statement) Query(stm *sql.Stmt, query string, timeFormat string, queryPa
 
 	// query the db with the dynamic query and it’s params
 	res, err := stm.Query(query, queryParams)
-	if err != nil {
-		return results, err
-	}
-
-	defer res.Close()
-
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 
@@ -62,8 +54,6 @@ func (s Statement) Query(stm *sql.Stmt, query string, timeFormat string, queryPa
 }
 
 func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
-
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -78,12 +68,6 @@ func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, query st
 
 	// query the db with the dynamic query and it’s params
 	res, err := stm.QueryContext(ctx, query, queryParams)
-	if err != nil {
-		return results, err
-	}
-
-	defer res.Close()
-
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 

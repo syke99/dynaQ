@@ -21,8 +21,6 @@ func NewDbService() service {
 }
 
 func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
-
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -37,12 +35,6 @@ func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryPa
 
 	// query the db with the dynamic query and it’s params
 	res, err := dBase.Query(query, queryParams)
-	if err != nil {
-		return results, err
-	}
-
-	defer res.Close()
-
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 
@@ -62,8 +54,6 @@ func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryPa
 }
 
 func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var results []map[string]models.QueryValue
-
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -78,12 +68,6 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 
 	// query the db with the dynamic query and it’s params
 	res, err := dBase.QueryContext(ctx, query, queryParams)
-	if err != nil {
-		return results, err
-	}
-
-	defer res.Close()
-
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 

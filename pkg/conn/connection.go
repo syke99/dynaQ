@@ -19,9 +19,6 @@ func NewConnectionService(conn *sql.Conn) service {
 }
 
 func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-
-	var results []map[string]models.QueryValue
-
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -36,12 +33,6 @@ func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query 
 
 	// query the db with the dynamic query and it’s params
 	res, err := conn.QueryContext(ctx, query, queryParams)
-	if err != nil {
-		return results, err
-	}
-
-	defer res.Close()
-
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 
