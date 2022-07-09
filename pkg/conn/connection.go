@@ -3,33 +3,35 @@ package conn
 import (
 	"context"
 	"database/sql"
-
 	"github.com/syke99/dynaQ/internal"
+	"github.com/syke99/dynaQ/models"
 )
 
 type Connection struct{}
 
 type service interface {
-	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error)
-	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error)
+	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
+	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
 }
 
 func NewConnectionService(conn *sql.Conn) service {
 	return Connection{}
 }
 
-func (db Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]interface{}, error) {
+func (db Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
 
-	var results []map[string]interface{}
+	var results []map[string]models.QueryValue
 
-	var columnMap map[string]interface{}
+	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
+	var columnTypesSlice []string
 
-	rslt := internal.Result{
+	rslt := models.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
+		ColumnTypes:  columnTypesSlice,
 	}
 
 	// query the db with the dynamic query and it’s params
@@ -40,47 +42,35 @@ func (db Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query
 
 	defer res.Close()
 
-	// grab the column names from the result to later create an entry for each in result.Rows
-	columnNames, _ := res.Columns()
+	if err != nil {
+		var dummyResults []map[string]models.QueryValue
 
-	// make a dummy interface to scan each column’s value into
-	var dummyColumnValue interface{}
-
-	// this will keep the column names and column values synchronized to make assigning map entry values a breeze
-	for i, columnName := range columnNames {
-		rslt.ColumnNames[i] = columnName
-		rslt.ColumnValues[i] = dummyColumnValue
-		rslt.Columns[columnName] = dummyColumnValue
+		return dummyResults, err
 	}
 
-	for res.Next() {
-		// scans all values into a slice of interfaces of any size
-		err := res.Scan(rslt.ColumnValues...)
-		if err != nil {
-			return results, err
-		}
+	defer res.Close()
 
-		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
-		for i, value := range rslt.ColumnValues {
-			currentColumnName := rslt.ColumnNames[i]
-			rslt.Columns[currentColumnName] = value
-		}
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
+	if err != nil {
+		var dummyResults []map[string]models.QueryValue
 
-		results = append(results, rslt.Columns)
+		return dummyResults, err
 	}
 
-	return results, nil
+	return unmarshalled, nil
 }
 
-func (db Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]interface{}, error) {
-	var columnMap map[string]interface{}
+func (db Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
+	var columnTypesSlice []string
 
-	rslt := internal.Result{
+	rslt := models.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
+		ColumnTypes:  columnTypesSlice,
 	}
 
 	// query the db with the dynamic query and it’s params
@@ -89,31 +79,12 @@ func (db Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, qu
 		return rslt.Columns, err
 	}
 
-	// grab the column names from the result to later create an entry for each in result.Rows
-	columnNames, _ := res.Columns()
+	defer res.Close()
 
-	// make a dummy interface to scan each column’s value into
-	var dummyColumnValue interface{}
-
-	// this will keep the column names and column values synchronized to make assigning map entry values a breeze
-	for i, columnName := range columnNames {
-		rslt.ColumnNames[i] = columnName
-		rslt.ColumnValues[i] = dummyColumnValue
-		rslt.Columns[columnName] = dummyColumnValue
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res)
+	if err != nil {
+		return rslt.Columns, err
 	}
 
-	if res.Next() {
-		// scans all values into a slice of interfaces of any size
-		err := res.Scan(rslt.ColumnValues...)
-		if err != nil {
-			return rslt.Columns, err
-		}
-
-		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
-		for i, value := range rslt.ColumnValues {
-			currentColumnName := rslt.ColumnNames[i]
-			rslt.Columns[currentColumnName] = value
-		}
-	}
-	return rslt.Columns, nil
+	return unmarshalled, nil
 }
