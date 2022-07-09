@@ -88,58 +88,233 @@ func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
 	return dq
 }
 
-func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.dbService.Query(dq.db, query, dq.timeFormat, args)
+func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.dbService.Query(dq.db, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
-	return dq.dbService.QueryRow(dq.db, query, dq.timeFormat, args)
+func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.dbService.QueryRow(dq.db, query, dq.timeFormat, args)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
 
-func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.dbService.QueryWithContext(dq.db, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.dbService.QueryWithContext(dq.db, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
-	return dq.dbService.QueryRowWithContext(dq.db, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.dbService.QueryRowWithContext(dq.db, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
 
-func (dq DynaQ) PreparedStatementQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.stmntService.Query(dq.stmnt, query, dq.timeFormat, args)
+func (dq DynaQ) PreparedStatementQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.stmntService.Query(dq.stmnt, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) PreparedStatementQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
-	return dq.stmntService.QueryRow(dq.stmnt, query, dq.timeFormat, args)
+func (dq DynaQ) PreparedStatementQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.stmntService.QueryRow(dq.stmnt, query, dq.timeFormat, args)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
 
-func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.stmntService.QueryWithContext(dq.stmnt, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.stmntService.QueryWithContext(dq.stmnt, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context, query string) (map[string]models.QueryValue, error) {
-	return dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, query, dq.timeFormat)
+func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context, query string) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, query, dq.timeFormat)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
 
-func (dq DynaQ) TransactionQuery(query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.txService.Query(dq.tx, query, dq.timeFormat, args)
+func (dq DynaQ) TransactionQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.txService.Query(dq.tx, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (map[string]models.QueryValue, error) {
-	return dq.txService.QueryRow(dq.tx, query, dq.timeFormat, args)
+func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.txService.QueryRow(dq.tx, query, dq.timeFormat, args)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
 
-func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.txService.QueryWithContext(dq.tx, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.txService.QueryWithContext(dq.tx, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
-	return dq.txService.QueryRowWithContext(dq.tx, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.txService.QueryRowWithContext(dq.tx, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
 
-func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) ([]map[string]models.QueryValue, error) {
-	return dq.conService.QueryWithContext(dq.conn, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
+	var dud []map[string]models.QueryValue
+	rows := models.MultiRowResult{
+		CurrentRow: 1,
+		Results:    dud,
+	}
+
+	r, err := dq.conService.QueryWithContext(dq.conn, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return rows, err
+	}
+
+	rows.Results = r
+
+	return rows, nil
 }
 
-func (dq DynaQ) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (map[string]models.QueryValue, error) {
-	return dq.conService.QueryRowWithContext(dq.conn, ctx, query, dq.timeFormat, args)
+func (dq DynaQ) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
+	dud := map[string]models.QueryValue{}
+	row := models.SingleRowResult{
+		Result: dud,
+	}
+
+	r, err := dq.conService.QueryRowWithContext(dq.conn, ctx, query, dq.timeFormat, args)
+	if err != nil {
+		return row, err
+	}
+
+	row.Result = r
+
+	return row, nil
 }
