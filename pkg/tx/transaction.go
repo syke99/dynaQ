@@ -4,31 +4,31 @@ import (
 	"context"
 	"database/sql"
 	"github.com/syke99/dynaQ/internal"
-	models2 "github.com/syke99/dynaQ/pkg/models"
+	"github.com/syke99/dynaQ/pkg/models"
 )
 
 type Transaction struct{}
 
 type service interface {
-	Query(tx *sql.Tx, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error)
-	QueryWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error)
-	QueryRow(tx *sql.Tx, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error)
-	QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error)
+	Query(tx *sql.Tx, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
+	QueryWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
+	QueryRow(tx *sql.Tx, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
+	QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
 }
 
 func NewTransactionService() service {
 	return Transaction{}
 }
 
-func (db Transaction) Query(tx *sql.Tx, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error) {
-	var results []map[string]models2.QueryValue
+func (t Transaction) Query(tx *sql.Tx, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
+	var results []map[string]models.QueryValue
 
-	var columnMap map[string]models2.QueryValue
+	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models2.Result{
+	rslt := models.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
@@ -44,7 +44,7 @@ func (db Transaction) Query(tx *sql.Tx, query string, queryParams ...interface{}
 	defer res.Close()
 
 	if err != nil {
-		var dummyResults []map[string]models2.QueryValue
+		var dummyResults []map[string]models.QueryValue
 
 		return dummyResults, err
 	}
@@ -53,7 +53,7 @@ func (db Transaction) Query(tx *sql.Tx, query string, queryParams ...interface{}
 
 	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
 	if err != nil {
-		var dummyResults []map[string]models2.QueryValue
+		var dummyResults []map[string]models.QueryValue
 
 		return dummyResults, err
 	}
@@ -61,13 +61,13 @@ func (db Transaction) Query(tx *sql.Tx, query string, queryParams ...interface{}
 	return unmarshalled, nil
 }
 
-func (db Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models2.QueryValue, error) {
-	var columnMap map[string]models2.QueryValue
+func (t Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
+	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models2.Result{
+	rslt := models.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
@@ -77,7 +77,7 @@ func (db Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, query st
 	// query the db with the dynamic query and it’s params
 	res, err := tx.QueryContext(ctx, query, queryParams)
 	if err != nil {
-		var dummyResults []map[string]models2.QueryValue
+		var dummyResults []map[string]models.QueryValue
 
 		return dummyResults, err
 	}
@@ -86,7 +86,7 @@ func (db Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, query st
 
 	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
 	if err != nil {
-		var dummyResults []map[string]models2.QueryValue
+		var dummyResults []map[string]models.QueryValue
 
 		return dummyResults, err
 	}
@@ -94,13 +94,13 @@ func (db Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, query st
 	return unmarshalled, nil
 }
 
-func (db Transaction) QueryRow(tx *sql.Tx, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error) {
-	var columnMap map[string]models2.QueryValue
+func (t Transaction) QueryRow(tx *sql.Tx, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models2.Result{
+	rslt := models.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,
@@ -123,13 +123,13 @@ func (db Transaction) QueryRow(tx *sql.Tx, query string, queryParams ...interfac
 	return unmarshalled, nil
 }
 
-func (db Transaction) QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) (map[string]models2.QueryValue, error) {
-	var columnMap map[string]models2.QueryValue
+func (t Transaction) QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
 	var columnTypesSlice []string
 
-	rslt := models2.Result{
+	rslt := models.Result{
 		Columns:      columnMap,
 		ColumnValues: columnValuesSlice,
 		ColumnNames:  columnNamesSlice,

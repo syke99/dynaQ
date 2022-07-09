@@ -3,11 +3,11 @@ package internal
 import (
 	"database/sql"
 	"fmt"
-	models2 "github.com/syke99/dynaQ/pkg/models"
+	"github.com/syke99/dynaQ/pkg/models"
 	"reflect"
 )
 
-func UnmarshalRow(res *models2.Result, rows *sql.Rows) (map[string]models2.QueryValue, error) {
+func UnmarshalRow(res *models.Result, rows *sql.Rows) (map[string]models.QueryValue, error) {
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
 
@@ -15,7 +15,7 @@ func UnmarshalRow(res *models2.Result, rows *sql.Rows) (map[string]models2.Query
 	var dummyColumnValue interface{}
 
 	// make a dummy Result to correctly initialize Columns
-	dummyRes := models2.QueryValue{}
+	dummyRes := models.QueryValue{}
 
 	// this will keep the column names and column values synchronized to make assigning map entry values a breeze
 	for i, columnName := range columnNames {
@@ -43,7 +43,7 @@ func UnmarshalRow(res *models2.Result, rows *sql.Rows) (map[string]models2.Query
 		// loop through the columnValues and assign them to the correct map entry in rslt.columns using the index of the value in rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range res.ColumnValues {
 			currentColumnName := res.ColumnNames[i]
-			qr := models2.QueryValue{
+			qr := models.QueryValue{
 				Type:  fmt.Sprintf("%v", reflect.ValueOf(&value).Kind()),
 				Value: value,
 			}
@@ -54,8 +54,8 @@ func UnmarshalRow(res *models2.Result, rows *sql.Rows) (map[string]models2.Query
 	return res.Columns, nil
 }
 
-func UnmarshalRows(res *models2.Result, rows *sql.Rows, columnTypesSlice []string) ([]map[string]models2.QueryValue, error) {
-	var results []map[string]models2.QueryValue
+func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string) ([]map[string]models.QueryValue, error) {
+	var results []map[string]models.QueryValue
 
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
@@ -64,7 +64,7 @@ func UnmarshalRows(res *models2.Result, rows *sql.Rows, columnTypesSlice []strin
 	var dummyColumnValue interface{}
 
 	// make a dummy Result to correctly initialize Columns
-	dummyRes := models2.QueryValue{}
+	dummyRes := models.QueryValue{}
 
 	// this will keep the column names and column values synchronized to make assigning map entry values a breeze
 	for i, columnName := range columnNames {
@@ -98,7 +98,7 @@ func UnmarshalRows(res *models2.Result, rows *sql.Rows, columnTypesSlice []strin
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
-			qr := models2.QueryValue{
+			qr := models.QueryValue{
 				Type:  currentColumnType,
 				Value: value,
 			}
