@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"github.com/syke99/dynaQ/pkg/models"
 	"reflect"
+	"time"
 )
 
-func UnmarshalRow(res *models.Result, rows *sql.Rows) (map[string]models.QueryValue, error) {
+func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) (map[string]models.QueryValue, error) {
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
 
@@ -54,7 +55,7 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows) (map[string]models.QueryVa
 	return res.Columns, nil
 }
 
-func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string) ([]map[string]models.QueryValue, error) {
+func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string, timeFormat string) ([]map[string]models.QueryValue, error) {
 	var results []map[string]models.QueryValue
 
 	// grab the column names from the result to later create an entry for each in result.Rows
@@ -94,7 +95,15 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, columnTypesSlice []string
 		// rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i, value := range res.ColumnValues {
 			if (i + 1) <= len(res.ColumnValues) {
-				columnTypesSlice[i] = fmt.Sprintf("%v", reflect.ValueOf(&value).Kind())
+				colType := fmt.Sprintf("%v", reflect.ValueOf(&value).Kind())
+				if colType == "string" {
+					valString := fmt.Sprintf("%v", reflect.ValueOf(value))
+					_, err := time.Parse(timeFormat, valString)
+					if err != nil {
+						colType = "time.Time"
+					}
+				}
+				columnTypesSlice[i] = colType
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]

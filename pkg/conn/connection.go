@@ -10,15 +10,15 @@ import (
 type Connection struct{}
 
 type service interface {
-	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
+	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
+	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error)
 }
 
 func NewConnectionService(conn *sql.Conn) service {
 	return Connection{}
 }
 
-func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
+func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
 
 	var results []map[string]models.QueryValue
 
@@ -50,7 +50,7 @@ func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query 
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice, timeFormat)
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 
@@ -60,7 +60,7 @@ func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query 
 	return unmarshalled, nil
 }
 
-func (c Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+func (c Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -81,7 +81,7 @@ func (c Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, que
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
 	if err != nil {
 		return rslt.Columns, err
 	}

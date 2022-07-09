@@ -10,17 +10,17 @@ import (
 type DataBase struct{}
 
 type service interface {
-	Query(db *sql.DB, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryWithContext(db *sql.DB, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryRow(db *sql.DB, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
-	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error)
+	Query(db *sql.DB, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
+	QueryWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
+	QueryRow(db *sql.DB, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error)
+	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error)
 }
 
 func NewDbService() service {
 	return DataBase{}
 }
 
-func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
+func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
 	var results []map[string]models.QueryValue
 
 	var columnMap map[string]models.QueryValue
@@ -51,7 +51,7 @@ func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice, timeFormat)
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 
@@ -61,7 +61,7 @@ func (db DataBase) Query(dBase *sql.DB, query string, queryParams ...interface{}
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
+func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
 	var results []map[string]models.QueryValue
 
 	var columnMap map[string]models.QueryValue
@@ -92,7 +92,7 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice, timeFormat)
 	if err != nil {
 		var dummyResults []map[string]models.QueryValue
 
@@ -102,7 +102,7 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+func (db DataBase) QueryRow(dBase *sql.DB, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -123,7 +123,7 @@ func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interfac
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
 	if err != nil {
 		return rslt.Columns, err
 	}
@@ -131,7 +131,7 @@ func (db DataBase) QueryRow(dBase *sql.DB, query string, queryParams ...interfac
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -152,7 +152,7 @@ func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
 	if err != nil {
 		return rslt.Columns, err
 	}
