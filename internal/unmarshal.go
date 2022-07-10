@@ -3,9 +3,10 @@ package internal
 import (
 	"database/sql"
 	"fmt"
-	"github.com/syke99/dynaQ/pkg/models"
 	"reflect"
 	"time"
+
+	"github.com/syke99/dynaQ/pkg/models"
 )
 
 func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.QueryValue, error) {
@@ -85,9 +86,9 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 			currentColumnType = columnTypesSlice[i]
 
 			qr := models.QueryValue{
-				Type:   currentColumnType,
-				Column: currentColumnName,
-				Value:  colVal,
+				Type:  currentColumnType,
+				Name:  currentColumnName,
+				Value: colVal,
 			}
 
 			rowResults[i] = qr
@@ -178,9 +179,9 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 			currentColumnType = columnTypesSlice[i]
 
 			qr := models.QueryValue{
-				Type:   currentColumnType,
-				Column: currentColumnName,
-				Value:  colVal,
+				Type:  currentColumnType,
+				Name:  currentColumnName,
+				Value: colVal,
 			}
 
 			rowResults[i] = qr
