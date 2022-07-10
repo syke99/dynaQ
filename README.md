@@ -88,14 +88,21 @@ func main() {
     if err != nil {
         panic(err)
     }
+    
+    newRow := true
 	
     fmt.Println("-----------------")
-    if ok, row := rows.NextRow(); ok {
-        for _, column := range row {
-            fmt.Sprintf("%s: %v", column.Name, fmt.Sprintf("%v", column.Value))
-            fmt.Println("-----------------")
+    for newRow {
+    	ok, row := rows.NextRow()
+	if !ok {
+		newRow = false
+    	}
+	for _, column := range row {
+            	fmt.Sprintf("%s: %v", column.Name, fmt.Sprintf("%v", column.Value))
+            	fmt.Println("-----------------")
         }
     }
+    
     //
     // this will output:
     // -----------------
