@@ -1,4 +1,6 @@
 # dynaQ
+[![Go Reference](https://pkg.go.dev/badge/github.com/syke99/dynaQ.svg)](https://pkg.go.dev/github.com/syke99/dynaQ)
+[![go reportcard](https://goreportcard.com/badge/github.com/syke99/dynaQ)](https://goreportcard.com/report/github.com/syke99/dynaQ)</br>
 An extension for Go's sql package in the standard library to support dynamic queries directly from the database, as well as on database connections, prepared statements and transactions
 
 
