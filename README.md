@@ -71,21 +71,23 @@ func main() {
 	    panic(err)
     }
     
+    
+    fmt.Println("-----------------")
     // a dynaQ column holds the type in field
     // <columnVariable>.Type for easy type
     // assertion later on
     for _, column := range row {
-	     fmt.Sprintf("%s: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type)
-	     fmt.Println("-----------------")
+	     fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
     }
+    fmt.Println("-----------------")
     //
     // this will output:
     // -----------------
-    // id: 1 (type: int64)
-    // name: ab (type: string)
-    // cost: 2.10 (type: float64)
-    // available: true (type: bool)
-    // created-date: 2018-01-18 05:43 (type: time.Time)
+    // column: id, value: 1 (type: int64)
+    // column: name, value: ab (type: string)
+    // column: cost, value: 2.10 (type: float64)
+    // column: available, value: true (type: bool)
+    // column: created-date, value: 2018-01-18 05:43 (type: time.Time)
     // -----------------
 	
 	
@@ -100,13 +102,14 @@ func main() {
 	
     fmt.Println("-----------------")
     for newRow {
-    	fmt.Println(rowNumber)
+    	fmt.Println(fmt.Sprintf("row: %d", rowNumber))
+    	fmt.Println("-----------------")
     	if ok, row := rows.NextRow(); !ok {
 		rowNumber = 1
 		newRow = false
     	}
 	for _, column := range row {
-            	fmt.Println(fmt.Sprintf("%s: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
+            	fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
         }
 	rowNumber++
 	fmt.Println("-----------------")
@@ -115,29 +118,37 @@ func main() {
     //
     // this will output:
     // -----------------
-    // id: 1 (type: int64)
-    // name: ab (type: string)
-    // cost: 2.10 (type: float64)
-    // available: true (type: bool)
-    // created-date: 2018-01-18 05:43 (type: time.Time)
+    // row: 1
     // -----------------
-    // id: 2 (type: int64)
-    // name: cd (type string)
-    // cost: 1.55 (type float64)
-    // available: false (type: bool)
-    // created-date: 2018-01-14 06:28 (type: time.Time)
+    // column: id, value: 1 (type: int64)
+    // column: name, value: ab (type: string)
+    // column: cost, value: 2.10 (type: float64)
+    // column: available, value: true (type: bool)
+    // column: created-date, value: 2018-01-18 05:43 (type: time.Time)
     // -----------------
-    // id: 4 (type: int64)
-    // name: gh (type: string)
-    // cost: 2.76 (type: float64)
-    // available: true (type: bool)
-    // created-date: 2018-09-04 15:09 (type: time.Time)
+    // row: 2
     // -----------------
-    // id: 7 (type: int64)
-    // name: mn (type: string)
-    // cost: 2.99 (type: float64)
-    // available: false (type: bool)
-    // created-date: 2019-02-11 06:22 (type: time.Time)
+    // column: id, value: 2 (type: int64)
+    // column: name, value: cd (type string)
+    // column: cost, value: 1.55 (type float64)
+    // column: available, value: false (type: bool)
+    // column: created-date, value: 2018-01-14 06:28 (type: time.Time)
+    // -----------------
+    // row: 3
+    // -----------------
+    // column: id, value: 4 (type: int64)
+    // column: name, value: gh (type: string)
+    // column: cost, value: 2.76 (type: float64)
+    // column: available, value: true (type: bool)
+    // column: created-date, value: 2018-09-04 15:09 (type: time.Time)
+    // -----------------
+    // row: 4
+    // -----------------
+    // column: id, value: 7 (type: int64)
+    // column: name, value: mn (type: string)
+    // column: cost, value: 2.99 (type: float64)
+    // column: available, value: false (type: bool)
+    // column: created-date, value: 2019-02-11 06:22 (type: time.Time)
     // -----------------
 }
 ```
