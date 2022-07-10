@@ -53,7 +53,7 @@ func main() {
     //    
     // testTable:
     // __| id | name | cost | available |   created-date   |__
-    // -----------------------------------------
+    // ---------------------------------------------------------
     //   |  1 |  ab  | 2.10 |   true    | 2018-01-18 05:43 |
     //   |  2 |  cd  | 1.55 |   false   | 2018-01-14 06:28 |
     //   |  3 |  ef  | 3.78 |   true    | 2018-06-27 09:59 |
@@ -113,7 +113,7 @@ func main() {
     // name: ab (type: string)
     // cost: 2.10 (type: float64)
     // available: true (type: bool)
-    // created-date: 2018-01-18 05:43 (type: time.Time
+    // created-date: 2018-01-18 05:43 (type: time.Time)
     // -----------------
     // id: 2 (type: int64)
     // name: cd (type string)
@@ -125,13 +125,13 @@ func main() {
     // name: gh (type: string)
     // cost: 2.76 (type: float64)
     // available: true (type: bool)
-    // created-date: 2018-09-04 15:09 (type: time.Time
+    // created-date: 2018-09-04 15:09 (type: time.Time)
     // -----------------
     // id: 7 (type: int64)
     // name: mn (type: string)
     // cost: 2.99 (type: float64)
     // available: false (type: bool)
-    // created-date: 2019-02-11 06:22 (type: time.Time
+    // created-date: 2019-02-11 06:22 (type: time.Time)
     // -----------------
 }
 ```
