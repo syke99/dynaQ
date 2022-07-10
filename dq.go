@@ -3,6 +3,7 @@ package dynaQ
 import (
 	"context"
 	"database/sql"
+
 	conServ "github.com/syke99/dynaQ/pkg/conn"
 	dbServ "github.com/syke99/dynaQ/pkg/db"
 	"github.com/syke99/dynaQ/pkg/models"
