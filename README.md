@@ -95,18 +95,21 @@ func main() {
         panic(err)
     }
     
+    rowNumber := 1
     newRow := true
 	
     fmt.Println("-----------------")
     for newRow {
-    	ok, row := rows.NextRow()
-	if !ok {
+    	fmt.Println(rowNumber)
+    	if ok, row := rows.NextRow(); !ok {
+		rowNumber = 1
 		newRow = false
     	}
 	for _, column := range row {
-            	fmt.Sprintf("%s: %v", column.Name, fmt.Sprintf("%v", column.Value))
-            	fmt.Println("-----------------")
+            	fmt.Println(fmt.Sprintf("%s: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
         }
+	rowNumber++
+	fmt.Println("-----------------")
     }
     
     //
