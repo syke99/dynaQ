@@ -3,10 +3,9 @@ package internal
 import (
 	"database/sql"
 	"fmt"
+	"github.com/syke99/dynaQ/pkg/resources/models"
 	"reflect"
 	"time"
-
-	"github.com/syke99/dynaQ/pkg/models"
 )
 
 func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.QueryValue, error) {

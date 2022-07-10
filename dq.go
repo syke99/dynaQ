@@ -3,13 +3,12 @@ package dynaQ
 import (
 	"context"
 	"database/sql"
-
-	conServ "github.com/syke99/dynaQ/pkg/conn"
-	dbServ "github.com/syke99/dynaQ/pkg/db"
-	"github.com/syke99/dynaQ/pkg/models"
-	stmntServ "github.com/syke99/dynaQ/pkg/stmnt"
-	"github.com/syke99/dynaQ/pkg/timeFmt"
-	txserv "github.com/syke99/dynaQ/pkg/tx"
+	"github.com/syke99/dynaQ/pkg/resources/models"
+	"github.com/syke99/dynaQ/pkg/resources/timeFmt"
+	conServ "github.com/syke99/dynaQ/pkg/services/conn"
+	dbServ "github.com/syke99/dynaQ/pkg/services/db"
+	stmntServ "github.com/syke99/dynaQ/pkg/services/stmnt"
+	txserv "github.com/syke99/dynaQ/pkg/services/tx"
 )
 
 type DynaQ struct {

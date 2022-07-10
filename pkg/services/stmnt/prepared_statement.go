@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/syke99/dynaQ/internal"
-	"github.com/syke99/dynaQ/pkg/models"
+	"github.com/syke99/dynaQ/pkg/resources/models"
 )
 
 type Statement struct{}
