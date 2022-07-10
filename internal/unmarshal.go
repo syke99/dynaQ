@@ -56,7 +56,7 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 			valuePointers[i] = &values[i]
 		}
 		// scans all values into a slice of interfaces of any size
-		err := rows.Scan(res.ColumnValues)
+		err := rows.Scan(valuePointers...)
 		if err != nil {
 			return rowResults, err
 		}
@@ -66,16 +66,24 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 			colVal := evalVal(values[i])
 			if i < len(valuePointers) {
 				colType := evalType(values[i])
-				if colType == "string" {
-					_, err := time.Parse(timeFormat, colVal)
-					if err != nil {
-						colType = "time.Time"
-					}
-				}
+
 				columnTypesSlice[i] = colType
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
+
+			if currentColumnType == "string" {
+				_, err := time.Parse(timeFormat, colVal)
+				if err != nil {
+					println(err.Error())
+					columnTypesSlice[i] = "string"
+				} else {
+					columnTypesSlice[i] = "time.Time"
+				}
+			}
+
+			currentColumnType = columnTypesSlice[i]
+
 			qr := models.QueryValue{
 				Type:   currentColumnType,
 				Column: currentColumnName,
@@ -157,7 +165,6 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
 
-			// TODO: figure out why colVal that holds a date isn't parsing with matching formats
 			if currentColumnType == "string" {
 				_, err := time.Parse(timeFormat, colVal)
 				if err != nil {

@@ -2,44 +2,27 @@ package conn
 
 import (
 	"context"
-	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestNewConnectionService(t *testing.T) {
-	// Arrange
-	var conn *sql.Conn
-
 	// Act
-	connService, err := NewConnectionService(conn)
+	connService := NewConnectionService()
 
 	// Assert
 	assert.NotNil(t, connService)
-	assert.NoError(t, err)
 }
 
-func TestNewConnectionService_NoConnection(t *testing.T) {
-	// Act
-	connService, err := NewConnectionService(nil)
-
-	// Assert
-	assert.NotNil(t, connService)
-	assert.NoError(t, err)
-}
-
-func TestConnection_QueryWithContext(t *testing.T) {
+func TestConnection_QueryRowWithContext(t *testing.T) {
 	// Arrange
 	testQuery := "SELECT * FROM testing"
 
-	var conn *sql.Conn
-	connService, _ := NewConnectionService(conn)
+	connService := NewConnectionService()
 
 	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
-		AddRow(1, "test1", "10/28/90").
-		AddRow("2", "test2", "10/28/90").
-		AddRow(1.1, "test3", "10/28/90")
+		AddRow(1, "test1", "2018-01-20 04:35")
 
 	db, mock, _ := sqlmock.New()
 	mock.ExpectQuery("SELECT (.*) FROM").
@@ -48,7 +31,47 @@ func TestConnection_QueryWithContext(t *testing.T) {
 	// Act
 	con, err := db.Conn(context.Background())
 
-	resRows, err := connService.QueryWithContext(con, context.Background(), testQuery, "10/28/90")
+	resRow, err := connService.QueryRowWithContext(con, context.Background(), testQuery, "2006-01-02 15:04")
+
+	// Assert
+
+	// Row 1
+	assert.NoError(t, err)
+	assert.Equal(t, "id", resRow[0].Column)
+	assert.Equal(t, "1", resRow[0].Value)
+	assert.Equal(t, "int64", resRow[0].Type)
+	assert.Equal(t, "name", resRow[1].Column)
+	assert.Equal(t, "test1", resRow[1].Value)
+	assert.Equal(t, "string", resRow[1].Type)
+	assert.Equal(t, "date", resRow[2].Column)
+	// due to times having the chance of being off by a matter of milliseconds,
+	// we wont worry about testing with the default time format. However,
+	// this would be a good example of testing a date returned, as long as the
+	// value passed in where time.Now() is passed is the same format
+	// ass the time format you're using
+	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0][2].Value)
+	assert.Equal(t, "time.Time", resRow[2].Type)
+}
+
+func TestConnection_QueryWithContext(t *testing.T) {
+	// Arrange
+	testQuery := "SELECT * FROM testing"
+
+	connService := NewConnectionService()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
+		AddRow(1, "test1", "2018-01-20 04:35").
+		AddRow("2", "test2", "2018-01-20 04:35").
+		AddRow(1.1, "test3", "2018-01-20 04:35")
+
+	db, mock, _ := sqlmock.New()
+	mock.ExpectQuery("SELECT (.*) FROM").
+		WillReturnRows(rows)
+
+	// Act
+	con, err := db.Conn(context.Background())
+
+	resRows, err := connService.QueryWithContext(con, context.Background(), testQuery, "2006-01-02 15:04")
 
 	// Assert
 
@@ -69,22 +92,22 @@ func TestConnection_QueryWithContext(t *testing.T) {
 	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0][2].Value)
 	assert.Equal(t, "time.Time", resRows[0][2].Type)
 
-	//// Row 2
-	//assert.NoError(t, err)
-	//assert.Equal(t, "id", resRows[1][0].Column)
-	//assert.Equal(t, "2", resRows[1][0].Value)
-	//assert.Equal(t, "string", resRows[1][0].Type)
-	//assert.Equal(t, "name", resRows[1][1].Column)
-	//assert.Equal(t, "test2", resRows[1][1].Value)
-	//assert.Equal(t, "string", resRows[1][1].Type)
-	//assert.Equal(t, "date", resRows[1][2].Column)
-	//// due to times having the chance of being off by a matter of milliseconds,
-	//// we wont worry about testing with the default time format. However,
-	//// this would be a good example of testing a date returned, as long as the
-	//// value passed in where time.Now() is passed is the same format
-	//// ass the time format you're using
-	//// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0][2].Value)
-	//assert.Equal(t, "time.Time", resRows[1][2].Type)
+	// Row 2
+	assert.NoError(t, err)
+	assert.Equal(t, "id", resRows[1][0].Column)
+	assert.Equal(t, "2", resRows[1][0].Value)
+	assert.Equal(t, "string", resRows[1][0].Type)
+	assert.Equal(t, "name", resRows[1][1].Column)
+	assert.Equal(t, "test2", resRows[1][1].Value)
+	assert.Equal(t, "string", resRows[1][1].Type)
+	assert.Equal(t, "date", resRows[1][2].Column)
+	// due to times having the chance of being off by a matter of milliseconds,
+	// we wont worry about testing with the default time format. However,
+	// this would be a good example of testing a date returned, as long as the
+	// value passed in where time.Now() is passed is the same format
+	// ass the time format you're using
+	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0][2].Value)
+	assert.Equal(t, "time.Time", resRows[1][2].Type)
 
 	// Row 3
 	assert.NoError(t, err)

@@ -10,17 +10,17 @@ import (
 type Statement struct{}
 
 type service interface {
-	Query(stm *sql.Stmt, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryWithContext(stm *sql.Stmt, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error)
-	QueryRow(stm *sql.Stmt, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error)
-	QueryRowWithContext(stm *sql.Stmt, ctx context.Context, query string, timeFormat string) (map[string]models.QueryValue, error)
+	Query(stm *sql.Stmt, timeFormat string, queryParams ...interface{}) ([][]models.QueryValue, error)
+	QueryWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams ...interface{}) ([][]models.QueryValue, error)
+	QueryRow(stm *sql.Stmt, timeFormat string, queryParams ...interface{}) ([]models.QueryValue, error)
+	QueryRowWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams ...interface{}) ([]models.QueryValue, error)
 }
 
 func NewPreparedStatementService() service {
 	return Statement{}
 }
 
-func (s Statement) Query(stm *sql.Stmt, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
+func (s Statement) Query(stm *sql.Stmt, timeFormat string, queryParams ...interface{}) ([][]models.QueryValue, error) {
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -34,51 +34,18 @@ func (s Statement) Query(stm *sql.Stmt, query string, timeFormat string, queryPa
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := stm.Query(query, queryParams)
+	res, err := stm.Query(queryParams...)
 	if err != nil {
-		var dummyResults []map[string]models.QueryValue
+		var dummyResults [][]models.QueryValue
 
 		return dummyResults, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice, timeFormat)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
-		var dummyResults []map[string]models.QueryValue
-
-		return dummyResults, err
-	}
-
-	return unmarshalled, nil
-}
-
-func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]map[string]models.QueryValue, error) {
-	var columnMap map[string]models.QueryValue
-	var columnValuesSlice []interface{}
-	var columnNamesSlice []string
-	var columnTypesSlice []string
-
-	rslt := models.Result{
-		Columns:      columnMap,
-		ColumnValues: columnValuesSlice,
-		ColumnNames:  columnNamesSlice,
-		ColumnTypes:  columnTypesSlice,
-	}
-
-	// query the db with the dynamic query and it’s params
-	res, err := stm.QueryContext(ctx, query, queryParams)
-	if err != nil {
-		var dummyResults []map[string]models.QueryValue
-
-		return dummyResults, err
-	}
-
-	defer res.Close()
-
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, columnTypesSlice, timeFormat)
-	if err != nil {
-		var dummyResults []map[string]models.QueryValue
+		var dummyResults [][]models.QueryValue
 
 		return dummyResults, err
 	}
@@ -86,7 +53,7 @@ func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, query st
 	return unmarshalled, nil
 }
 
-func (s Statement) QueryRow(stm *sql.Stmt, query string, timeFormat string, queryParams ...interface{}) (map[string]models.QueryValue, error) {
+func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams ...interface{}) ([][]models.QueryValue, error) {
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -100,22 +67,26 @@ func (s Statement) QueryRow(stm *sql.Stmt, query string, timeFormat string, quer
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := stm.Query(query, queryParams)
+	res, err := stm.QueryContext(ctx, queryParams...)
 	if err != nil {
-		return rslt.Columns, err
+		var dummyResults [][]models.QueryValue
+
+		return dummyResults, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, columnTypesSlice, timeFormat)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
-		return rslt.Columns, err
+		var dummyResults [][]models.QueryValue
+
+		return dummyResults, err
 	}
 
 	return unmarshalled, nil
 }
 
-func (s Statement) QueryRowWithContext(stm *sql.Stmt, ctx context.Context, query string, timeFormat string) (map[string]models.QueryValue, error) {
+func (s Statement) QueryRow(stm *sql.Stmt, timeFormat string, queryParams ...interface{}) ([]models.QueryValue, error) {
 	var columnMap map[string]models.QueryValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -129,16 +100,53 @@ func (s Statement) QueryRowWithContext(stm *sql.Stmt, ctx context.Context, query
 	}
 
 	// query the db with the dynamic query and it’s params
-	res, err := stm.QueryContext(ctx, query)
+	res, err := stm.Query(queryParams...)
 	if err != nil {
-		return rslt.Columns, err
+		var dummyResults []models.QueryValue
+
+		return dummyResults, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, columnTypesSlice, timeFormat)
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
 	if err != nil {
-		return rslt.Columns, err
+		var dummyResults []models.QueryValue
+
+		return dummyResults, err
+	}
+
+	return unmarshalled, nil
+}
+
+func (s Statement) QueryRowWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams ...interface{}) ([]models.QueryValue, error) {
+	var columnMap map[string]models.QueryValue
+	var columnValuesSlice []interface{}
+	var columnNamesSlice []string
+	var columnTypesSlice []string
+
+	rslt := models.Result{
+		Columns:      columnMap,
+		ColumnValues: columnValuesSlice,
+		ColumnNames:  columnNamesSlice,
+		ColumnTypes:  columnTypesSlice,
+	}
+
+	// query the db with the dynamic query and it’s params
+	res, err := stm.QueryContext(ctx, queryParams...)
+	if err != nil {
+		var dummyResults []models.QueryValue
+
+		return dummyResults, err
+	}
+
+	defer res.Close()
+
+	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
+	if err != nil {
+		var dummyResults []models.QueryValue
+
+		return dummyResults, err
 	}
 
 	return unmarshalled, nil

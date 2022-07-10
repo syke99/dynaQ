@@ -8,21 +8,21 @@ type Result struct {
 }
 
 type SingleRowResult struct {
-	Result map[string]QueryValue
+	Result []QueryValue
 }
 
-func (s SingleRowResult) Row() map[string]QueryValue {
+func (s SingleRowResult) Row() []QueryValue {
 	return s.Result
 }
 
 type MultiRowResult struct {
 	CurrentRow int
-	Results    []map[string]QueryValue
+	Results    [][]QueryValue
 }
 
-func (m MultiRowResult) NextRow() (bool, map[string]QueryValue) {
+func (m MultiRowResult) NextRow() (bool, []QueryValue) {
 	if m.CurrentRow > len(m.Results) {
-		dud := make(map[string]QueryValue)
+		var dud []QueryValue
 		return false, dud
 	}
 

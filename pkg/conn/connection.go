@@ -3,7 +3,6 @@ package conn
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"github.com/syke99/dynaQ/internal"
 	"github.com/syke99/dynaQ/pkg/models"
 )
@@ -15,11 +14,8 @@ type service interface {
 	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([]models.QueryValue, error)
 }
 
-func NewConnectionService(conn *sql.Conn) (service, error) {
-	if conn == nil {
-		return Connection{}, errors.New("no sql connection provided")
-	}
-	return Connection{}, nil
+func NewConnectionService() service {
+	return Connection{}
 }
 
 func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams ...interface{}) ([][]models.QueryValue, error) {
