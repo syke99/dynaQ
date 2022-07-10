@@ -52,15 +52,15 @@ func main() {
     // you can query for multiple rows, or just one row at once
     //    
     // testTable:
-    // __| id | name | cost |   created-date   |__
+    // __| id | name | cost | available |   created-date   |__
     // -----------------------------------------
-    //   |  1 |  ab  | 2.10 | 2018-01-18 05:43 |
-    //   |  2 |  cd  | 1.55 | 2018-01-14 06:28 |
-    //   |  3 |  ef  | 3.78 | 2018-06-27 09:59 |
-    //   |  4 |  gh  | 2.76 | 2018-09-04 15:09 |
-    //   |  5 |  ij  | 8.13 | 2019-01-01 23:43 |
-    //   |  6 |  kl  | 4.45 | 2019-01-19 10:14 |
-    //   |  7 |  mn  | 2.99 | 2019-02-11 06:22 |
+    //   |  1 |  ab  | 2.10 |   true    | 2018-01-18 05:43 |
+    //   |  2 |  cd  | 1.55 |   false   | 2018-01-14 06:28 |
+    //   |  3 |  ef  | 3.78 |   true    | 2018-06-27 09:59 |
+    //   |  4 |  gh  | 2.76 |   true    | 2018-09-04 15:09 |
+    //   |  5 |  ij  | 8.13 |   true    | 2019-01-01 23:43 |
+    //   |  6 |  kl  | 4.45 |   false   | 2019-01-19 10:14 |
+    //   |  7 |  mn  | 2.99 |   false   | 2019-02-11 06:22 |
     //
     // single row:
     row, err := dq.DatabaseQueryRow("select * from testTable where id in (@p1, @p2, @p3, @p4)", 1, 2, 4, 7)
@@ -81,6 +81,7 @@ func main() {
     // id: 1 (type: int64)
     // name: ab (type: string)
     // cost: 2.10 (type: float64)
+    // available: true (type: bool)
     // created-date: 2018-01-18 05:43 (type: time.Time)
     // -----------------
 	
@@ -111,21 +112,25 @@ func main() {
     // id: 1 (type: int64)
     // name: ab (type: string)
     // cost: 2.10 (type: float64)
+    // available: true (type: bool)
     // created-date: 2018-01-18 05:43 (type: time.Time
     // -----------------
     // id: 2 (type: int64)
     // name: cd (type string)
     // cost: 1.55 (type float64)
+    // available: false (type: bool)
     // created-date: 2018-01-14 06:28 (type: time.Time)
     // -----------------
     // id: 4 (type: int64)
     // name: gh (type: string)
     // cost: 2.76 (type: float64)
+    // available: true (type: bool)
     // created-date: 2018-09-04 15:09 (type: time.Time
     // -----------------
     // id: 7 (type: int64)
     // name: mn (type: string)
     // cost: 2.99 (type: float64)
+    // available: false (type: bool)
     // created-date: 2019-02-11 06:22 (type: time.Time
     // -----------------
 }
