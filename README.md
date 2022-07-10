@@ -20,7 +20,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/syke99/dynaQ/"
+	"github.com/syke99/dynaQ"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -33,7 +33,7 @@ func main() {
   // create an instance of your database
     db, err := sql.Open("mysql", dsn(""))
     if err != nil {
-		panic(err)
+	    panic(err)
     }
     defer db.Close()
     
@@ -59,28 +59,28 @@ func main() {
     //   |  5 |  ij  | 8.13 | 2019-01-01 23:43 |
     //   |  6 |  kl  | 4.45 | 2019-01-19 10:14 |
     //   |  7 |  mn  | 2.99 | 2019-02-11 06:22 |
-	//
-	// single row:
-	row, err := db.DatabaseQueryRow("select * from testTable where id in (@p1, @p2, @p3, @p4)", 1, 2, 4, 7)
-	if err != nil {
-		panic(err)
-	}
+    //
+    // single row:
+    row, err := db.DatabaseQueryRow("select * from testTable where id in (@p1, @p2, @p3, @p4)", 1, 2, 4, 7)
+    if err != nil {
+	    panic(err)
+    }
     
-	// a dynaQ column holds the type in field
-	// <columnVariable>.Type for easy type
-	// assertion later on
-	for _, column := range row {
-		fmt.Sprintf("%s: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type)
-		fmt.Println("-----------------")
-	}
-	//
-	// this will output:
-	// -----------------
-	// id: 1 (type int64)
-	// name: ab (type string)
-	// cost: 2.10 (type float64)
-	// created-date: 2018-01-18 05:43 (time.Time)
-	// -----------------
+    // a dynaQ column holds the type in field
+    // <columnVariable>.Type for easy type
+    // assertion later on
+    for _, column := range row {
+	     fmt.Sprintf("%s: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type)
+	     fmt.Println("-----------------")
+    }
+    //
+    // this will output:
+    // -----------------
+    // id: 1 (type int64)
+    // name: ab (type string)
+    // cost: 2.10 (type float64)
+    // created-date: 2018-01-18 05:43 (time.Time)
+    // -----------------
 	
 	
     // multiple rows:
