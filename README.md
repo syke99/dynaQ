@@ -101,6 +101,11 @@ func main() {
 	
     fmt.Println("-----------------")
     for newRow {
+    	// the first value returned by rows.NextRow()
+	// is a bool signaling whether there is another
+	// row following the second value returned by
+	// rows.NextRow(), which represents the current
+	// row for this loop
     	if ok, row := rows.NextRow(); !ok {
 		newRow = false
     	}
