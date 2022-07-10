@@ -81,7 +81,7 @@ func (dq DynaQ) NewDqTransaction(tx *sql.Tx) DynaQ {
 }
 
 func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
-	conService, _ := conServ.NewConnectionService()
+	conService := conServ.NewConnectionService()
 
 	dq.conn = con
 	dq.conService = conService.(conServ.Connection)
