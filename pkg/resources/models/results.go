@@ -53,3 +53,7 @@ func (m MultiRowResult) Unmarshal(dest *interface{}) {
 
 	json.Unmarshal(marshalled, dest)
 }
+
+func (m MultiRowResult) GetColumnByName(columnName string) []ColumnValue {
+	return m.Columns[columnName]
+}
