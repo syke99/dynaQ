@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.QueryValue, error) {
+func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) (models.Row, error) {
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
 
@@ -16,10 +16,10 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 	var dummyColumnValue interface{}
 
 	// make a dummy Result to correctly initialize Columns
-	dummyRes := models.QueryValue{}
+	dummyRes := models.ColumnValue{}
 
 	count := len(columnNames)
-	colNames := make(map[string]models.QueryValue, count)
+	colNames := make(map[string]models.ColumnValue, count)
 	values := make([]interface{}, count)
 	valuePointers := make([]interface{}, count)
 
@@ -48,7 +48,9 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 		res.Columns[columnName] = dummyRes
 	}
 
-	rowResults := make([]models.QueryValue, count)
+	columns := make([]models.ColumnValue, len(values))
+
+	rowResults := models.Row{CurrentColumn: 0, Columns: columns}
 
 	if rows.Next() {
 		for i := range columnNames {
@@ -74,21 +76,21 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 
 			currentColumnType = columnTypesSlice[i]
 
-			qr := models.QueryValue{
+			qr := models.ColumnValue{
 				Type:  currentColumnType,
 				Name:  currentColumnName,
 				Value: colVal,
 			}
 
-			rowResults[i] = qr
+			rowResults.Columns[i] = qr
 		}
 	}
 
 	return rowResults, nil
 }
 
-func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]models.QueryValue, error) {
-	var results [][]models.QueryValue
+func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.Row, error) {
+	var results []models.Row
 
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
@@ -97,10 +99,10 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 	var dummyColumnValue interface{}
 
 	// make a dummy Result to correctly initialize Columns
-	dummyRes := models.QueryValue{}
+	dummyRes := models.ColumnValue{}
 
 	count := len(columnNames)
-	colNames := make(map[string]models.QueryValue, count)
+	colNames := make(map[string]models.ColumnValue, count)
 	values := make([]interface{}, count)
 	valuePointers := make([]interface{}, count)
 
@@ -140,7 +142,9 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 			return results, err
 		}
 
-		rowResults := make([]models.QueryValue, count)
+		columns := make([]models.ColumnValue, len(values))
+
+		rowResults := models.Row{CurrentColumn: 0, Columns: columns}
 
 		// loop through the columnValues and assign them to the correct
 		// map entry in rslt.columns using the index of the value in
@@ -157,13 +161,13 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 
 			currentColumnType = columnTypesSlice[i]
 
-			qr := models.QueryValue{
+			qr := models.ColumnValue{
 				Type:  currentColumnType,
 				Name:  currentColumnName,
 				Value: colVal,
 			}
 
-			rowResults[i] = qr
+			rowResults.Columns[i] = qr
 		}
 
 		results = append(results, rowResults)
@@ -184,7 +188,6 @@ func evalType(timeFormat string, colVal string, value interface{}) string {
 	if cType == "string" {
 		_, err := time.Parse(timeFormat, colVal)
 		if err != nil {
-			println(err.Error())
 			cType = "string"
 		} else {
 			cType = "time.Time"
