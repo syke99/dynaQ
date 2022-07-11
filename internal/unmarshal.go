@@ -89,8 +89,9 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) (models
 	return rowResults, nil
 }
 
-func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.Row, error) {
+func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var results []models.Row
+	var colMap map[string][]models.ColumnValue
 
 	// grab the column names from the result to later create an entry for each in result.Rows
 	columnNames, _ := rows.Columns()
@@ -139,7 +140,7 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 		// scans all values into a slice of interfaces of any size
 		err := rows.Scan(valuePointers...)
 		if err != nil {
-			return results, err
+			return results, colMap, err
 		}
 
 		columns := make([]models.ColumnValue, len(values))
@@ -173,7 +174,19 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 		results = append(results, rowResults)
 	}
 
-	return results, nil
+	for i, row := range results {
+		colBool, col := row.NextColumn()
+		for colBool {
+			colSlice := make([]models.ColumnValue, len(results))
+			if i == 0 {
+				colMap[col.Name] = colSlice
+				colMap[col.Name] = append(colMap[col.Name], col)
+			}
+			colMap[col.Name] = append(colMap[col.Name], col)
+		}
+	}
+
+	return results, colMap, nil
 }
 
 func evalType(timeFormat string, colVal string, value interface{}) string {

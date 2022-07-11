@@ -110,7 +110,7 @@ func TestDatabase_Query(t *testing.T) {
 	dummyQueryArgs := internal.QueryArgs{}
 
 	// Act
-	resRows, err := dbService.Query(db, testQuery, "2006-01-02 15:04", dummyQueryArgs)
+	resRows, _, err := dbService.Query(db, testQuery, "2006-01-02 15:04", dummyQueryArgs)
 
 	// Assert
 
@@ -187,7 +187,7 @@ func TestDatabase_QueryWithContext(t *testing.T) {
 	dummyQueryArgs := internal.QueryArgs{}
 
 	// Act
-	resRows, err := dbService.QueryWithContext(db, context.Background(), testQuery, "2006-01-02 15:04", dummyQueryArgs)
+	resRows, _, err := dbService.QueryWithContext(db, context.Background(), testQuery, "2006-01-02 15:04", dummyQueryArgs)
 
 	// Assert
 

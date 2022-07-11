@@ -28,23 +28,24 @@ func (s SingleRowResult) Unmarshal(dest *interface{}) {
 
 type MultiRowResult struct {
 	CurrentRow int
-	Results    []Row
+	Rows       []Row
+	Columns    map[string][]ColumnValue
 }
 
 func (m MultiRowResult) NextRow() (bool, Row) {
-	if m.CurrentRow > len(m.Results) {
+	if m.CurrentRow > len(m.Rows) {
 		var dud Row
 		return false, dud
 	}
 
 	m.CurrentRow++
-	return true, m.Results[m.CurrentRow-1]
+	return true, m.Rows[m.CurrentRow-1]
 }
 
 func (m MultiRowResult) Unmarshal(dest *interface{}) {
 	var jsonMap map[string]Row
 
-	for i, row := range m.Results {
+	for i, row := range m.Rows {
 		jsonMap[fmt.Sprintf("result-%d", i)] = row
 	}
 

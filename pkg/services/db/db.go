@@ -10,8 +10,8 @@ import (
 type DataBase struct{}
 
 type service interface {
-	Query(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
-	QueryWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
+	Query(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
+	QueryWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
 	QueryRow(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 }
@@ -20,7 +20,7 @@ func NewDbService() service {
 	return DataBase{}
 }
 
-func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -37,23 +37,25 @@ func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryPa
 	res, err := dBase.Query(query, queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
-func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -70,20 +72,22 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 	res, err := dBase.QueryContext(ctx, query, queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
 func (db DataBase) QueryRow(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error) {

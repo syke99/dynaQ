@@ -77,7 +77,7 @@ func TestConnection_QueryWithContext(t *testing.T) {
 
 	dummyQueryArgs := internal.QueryArgs{}
 
-	resRows, err := connService.QueryWithContext(con, context.Background(), testQuery, "2006-01-02 15:04", dummyQueryArgs)
+	resRows, _, err := connService.QueryWithContext(con, context.Background(), testQuery, "2006-01-02 15:04", dummyQueryArgs)
 
 	// Assert
 

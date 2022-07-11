@@ -10,8 +10,8 @@ import (
 type Statement struct{}
 
 type service interface {
-	Query(stm *sql.Stmt, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
-	QueryWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
+	Query(stm *sql.Stmt, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
+	QueryWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
 	QueryRow(stm *sql.Stmt, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 	QueryRowWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 }
@@ -20,7 +20,7 @@ func NewPreparedStatementService() service {
 	return Statement{}
 }
 
-func (s Statement) Query(stm *sql.Stmt, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (s Statement) Query(stm *sql.Stmt, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -37,23 +37,25 @@ func (s Statement) Query(stm *sql.Stmt, timeFormat string, queryParams internal.
 	res, err := stm.Query(queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
-func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -70,20 +72,22 @@ func (s Statement) QueryWithContext(stm *sql.Stmt, ctx context.Context, timeForm
 	res, err := stm.QueryContext(ctx, queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
 func (s Statement) QueryRow(stm *sql.Stmt, timeFormat string, queryParams internal.QueryArgs) (models.Row, error) {

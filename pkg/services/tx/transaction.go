@@ -10,8 +10,8 @@ import (
 type Transaction struct{}
 
 type service interface {
-	Query(tx *sql.Tx, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
-	QueryWithContext(tx *sql.Tx, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
+	Query(tx *sql.Tx, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
+	QueryWithContext(tx *sql.Tx, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
 	QueryRow(tx *sql.Tx, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 	QueryRowWithContext(tx *sql.Tx, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 }
@@ -20,7 +20,7 @@ func NewTransactionService() service {
 	return Transaction{}
 }
 
-func (t Transaction) Query(tx *sql.Tx, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (t Transaction) Query(tx *sql.Tx, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -37,23 +37,25 @@ func (t Transaction) Query(tx *sql.Tx, query string, timeFormat string, queryPar
 	res, err := tx.Query(query, queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
-func (t Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, timeFormat string, query string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (t Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, timeFormat string, query string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -70,20 +72,22 @@ func (t Transaction) QueryWithContext(tx *sql.Tx, ctx context.Context, timeForma
 	res, err := tx.QueryContext(ctx, query, queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
 func (t Transaction) QueryRow(tx *sql.Tx, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error) {

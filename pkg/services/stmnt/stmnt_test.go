@@ -122,7 +122,7 @@ func TestPreparedStatement_Query(t *testing.T) {
 	dummyQueryArgs := internal.QueryArgs{}
 
 	// Act
-	resRows, err := stmntService.Query(st, "2006-01-02 15:04", dummyQueryArgs)
+	resRows, _, err := stmntService.Query(st, "2006-01-02 15:04", dummyQueryArgs)
 
 	// Assert
 
@@ -198,7 +198,7 @@ func TestDatabase_QueryWithContext(t *testing.T) {
 	dummyQueryArgs := internal.QueryArgs{}
 
 	// Act
-	resRows, err := stmntService.Query(st, "2006-01-02 15:04", dummyQueryArgs)
+	resRows, _, err := stmntService.Query(st, "2006-01-02 15:04", dummyQueryArgs)
 
 	// Assert
 

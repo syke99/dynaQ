@@ -10,7 +10,7 @@ import (
 type Connection struct{}
 
 type service interface {
-	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
+	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error)
 	QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
 }
 
@@ -18,7 +18,7 @@ func NewConnectionService() service {
 	return Connection{}
 }
 
-func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, map[string][]models.ColumnValue, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -35,20 +35,22 @@ func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query 
 	res, err := conn.QueryContext(ctx, query, queryParams.Args...)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
+	unmarshalled, mappedColumns, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
 		var dummyResults []models.Row
+		var cMap map[string][]models.ColumnValue
 
-		return dummyResults, err
+		return dummyResults, cMap, err
 	}
 
-	return unmarshalled, nil
+	return unmarshalled, mappedColumns, nil
 }
 
 func (c Connection) QueryRowWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error) {
