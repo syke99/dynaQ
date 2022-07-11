@@ -6,17 +6,17 @@ import (
 )
 
 type Result struct {
-	Columns      map[string]QueryValue
+	Columns      map[string]ColumnValue
 	ColumnValues []interface{}
 	ColumnNames  []string
 	ColumnTypes  []string
 }
 
 type SingleRowResult struct {
-	Result []QueryValue
+	Result Row
 }
 
-func (s SingleRowResult) Row() []QueryValue {
+func (s SingleRowResult) Row() Row {
 	return s.Result
 }
 
@@ -28,12 +28,12 @@ func (s SingleRowResult) Unmarshal(dest *interface{}) {
 
 type MultiRowResult struct {
 	CurrentRow int
-	Results    [][]QueryValue
+	Results    []Row
 }
 
-func (m MultiRowResult) NextRow() (bool, []QueryValue) {
+func (m MultiRowResult) NextRow() (bool, Row) {
 	if m.CurrentRow > len(m.Results) {
-		var dud []QueryValue
+		var dud Row
 		return false, dud
 	}
 
@@ -42,7 +42,7 @@ func (m MultiRowResult) NextRow() (bool, []QueryValue) {
 }
 
 func (m MultiRowResult) Unmarshal(dest *interface{}) {
-	var jsonMap map[string][]QueryValue
+	var jsonMap map[string]Row
 
 	for i, row := range m.Results {
 		jsonMap[fmt.Sprintf("result-%d", i)] = row

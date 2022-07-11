@@ -90,7 +90,7 @@ func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
 }
 
 func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -107,7 +107,7 @@ func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRo
 }
 
 func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
@@ -123,7 +123,7 @@ func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (models.Sing
 }
 
 func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -140,7 +140,7 @@ func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...
 }
 
 func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
@@ -156,7 +156,7 @@ func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args 
 }
 
 func (dq DynaQ) PreparedStatementQuery(args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -173,7 +173,7 @@ func (dq DynaQ) PreparedStatementQuery(args ...interface{}) (models.MultiRowResu
 }
 
 func (dq DynaQ) PreparedStatementQueryRow(args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
@@ -189,7 +189,7 @@ func (dq DynaQ) PreparedStatementQueryRow(args ...interface{}) (models.SingleRow
 }
 
 func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -206,7 +206,7 @@ func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, args ...inter
 }
 
 func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
@@ -222,7 +222,7 @@ func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context) (models.Si
 }
 
 func (dq DynaQ) TransactionQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -239,7 +239,7 @@ func (dq DynaQ) TransactionQuery(query string, args ...interface{}) (models.Mult
 }
 
 func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
@@ -255,7 +255,7 @@ func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (models.S
 }
 
 func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -272,7 +272,7 @@ func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args 
 }
 
 func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
@@ -288,7 +288,7 @@ func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, ar
 }
 
 func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
@@ -305,7 +305,7 @@ func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args .
 }
 
 func (dq DynaQ) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
