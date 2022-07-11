@@ -3,6 +3,7 @@ package dynaQ
 import (
 	"context"
 	"database/sql"
+	"github.com/syke99/dynaQ/internal"
 	"github.com/syke99/dynaQ/pkg/resources/models"
 	"github.com/syke99/dynaQ/pkg/resources/timeFmt"
 	conServ "github.com/syke99/dynaQ/pkg/services/conn"
@@ -90,13 +91,15 @@ func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
 }
 
 func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.dbService.Query(dq.db, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.dbService.Query(dq.db, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -107,12 +110,14 @@ func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRo
 }
 
 func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.dbService.QueryRow(dq.db, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.dbService.QueryRow(dq.db, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
@@ -123,13 +128,15 @@ func (dq DynaQ) DatabaseQueryRow(query string, args ...interface{}) (models.Sing
 }
 
 func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.dbService.QueryWithContext(dq.db, ctx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.dbService.QueryWithContext(dq.db, ctx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -140,12 +147,14 @@ func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...
 }
 
 func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.dbService.QueryRowWithContext(dq.db, ctx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.dbService.QueryRowWithContext(dq.db, ctx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
@@ -156,13 +165,15 @@ func (dq DynaQ) DatabaseQueryRowContext(ctx context.Context, query string, args 
 }
 
 func (dq DynaQ) PreparedStatementQuery(args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.stmntService.Query(dq.stmnt, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.stmntService.Query(dq.stmnt, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -173,12 +184,14 @@ func (dq DynaQ) PreparedStatementQuery(args ...interface{}) (models.MultiRowResu
 }
 
 func (dq DynaQ) PreparedStatementQueryRow(args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.stmntService.QueryRow(dq.stmnt, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.stmntService.QueryRow(dq.stmnt, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
@@ -189,13 +202,15 @@ func (dq DynaQ) PreparedStatementQueryRow(args ...interface{}) (models.SingleRow
 }
 
 func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.stmntService.QueryWithContext(dq.stmnt, ctx, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.stmntService.QueryWithContext(dq.stmnt, ctx, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -205,13 +220,15 @@ func (dq DynaQ) PreparedStatementQueryContext(ctx context.Context, args ...inter
 	return rows, nil
 }
 
-func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context, args ...interface{}) (models.SingleRowResult, error) {
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, dq.timeFormat)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.stmntService.QueryRowWithContext(dq.stmnt, ctx, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
@@ -222,13 +239,15 @@ func (dq DynaQ) PreparedStatementQueryRowContext(ctx context.Context) (models.Si
 }
 
 func (dq DynaQ) TransactionQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.txService.Query(dq.tx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.txService.Query(dq.tx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -239,12 +258,14 @@ func (dq DynaQ) TransactionQuery(query string, args ...interface{}) (models.Mult
 }
 
 func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.txService.QueryRow(dq.tx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.txService.QueryRow(dq.tx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
@@ -255,13 +276,15 @@ func (dq DynaQ) TransactionQueryRow(query string, args ...interface{}) (models.S
 }
 
 func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.txService.QueryWithContext(dq.tx, ctx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.txService.QueryWithContext(dq.tx, ctx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -272,12 +295,14 @@ func (dq DynaQ) TransactionQueryContext(ctx context.Context, query string, args 
 }
 
 func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.txService.QueryRowWithContext(dq.tx, ctx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.txService.QueryRowWithContext(dq.tx, ctx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
@@ -288,13 +313,15 @@ func (dq DynaQ) TransactionQueryRowContext(ctx context.Context, query string, ar
 }
 
 func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
-	var dud [][]models.QueryValue
+	var dud []models.Row
 	rows := models.MultiRowResult{
 		CurrentRow: 1,
 		Results:    dud,
 	}
 
-	r, err := dq.conService.QueryWithContext(dq.conn, ctx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.conService.QueryWithContext(dq.conn, ctx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return rows, err
 	}
@@ -305,12 +332,14 @@ func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args .
 }
 
 func (dq DynaQ) ConnectionQueryRowContext(ctx context.Context, query string, args ...interface{}) (models.SingleRowResult, error) {
-	var dud []models.QueryValue
+	var dud models.Row
 	row := models.SingleRowResult{
 		Result: dud,
 	}
 
-	r, err := dq.conService.QueryRowWithContext(dq.conn, ctx, query, dq.timeFormat, args)
+	queryArgs := internal.QueryArgs{Args: args}
+
+	r, err := dq.conService.QueryRowWithContext(dq.conn, ctx, query, dq.timeFormat, queryArgs)
 	if err != nil {
 		return row, err
 	}
