@@ -65,22 +65,12 @@ func UnmarshalRow(res *models.Result, rows *sql.Rows, timeFormat string) ([]mode
 		for i, _ := range valuePointers {
 			colVal := evalVal(values[i])
 			if i < len(valuePointers) {
-				colType := evalType(values[i])
+				colType := evalType(timeFormat, colVal, values[i])
 
 				columnTypesSlice[i] = colType
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
-
-			if currentColumnType == "string" {
-				_, err := time.Parse(timeFormat, colVal)
-				if err != nil {
-					println(err.Error())
-					columnTypesSlice[i] = "string"
-				} else {
-					columnTypesSlice[i] = "time.Time"
-				}
-			}
 
 			currentColumnType = columnTypesSlice[i]
 
@@ -158,22 +148,12 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 		for i, _ := range valuePointers {
 			colVal := evalVal(values[i])
 			if i < len(valuePointers) {
-				colType := evalType(values[i])
+				colType := evalType(timeFormat, colVal, values[i])
 
 				columnTypesSlice[i] = colType
 			}
 			currentColumnName := res.ColumnNames[i]
 			currentColumnType := columnTypesSlice[i]
-
-			if currentColumnType == "string" {
-				_, err := time.Parse(timeFormat, colVal)
-				if err != nil {
-					println(err.Error())
-					columnTypesSlice[i] = "string"
-				} else {
-					columnTypesSlice[i] = "time.Time"
-				}
-			}
 
 			currentColumnType = columnTypesSlice[i]
 
@@ -192,24 +172,30 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([][]m
 	return results, nil
 }
 
-func evalType(value interface{}) string {
-	test := reflect.ValueOf(value)
-
-	pointsTo := reflect.Indirect(test)
+func evalType(timeFormat string, colVal string, value interface{}) string {
+	pointsTo := reflect.Indirect(reflect.ValueOf(value))
 
 	cType := fmt.Sprintf("%v", pointsTo.Type())
 
 	if cType == "[]uint8" {
-		return "[]byte"
+		return "image ([]byte)"
+	}
+
+	if cType == "string" {
+		_, err := time.Parse(timeFormat, colVal)
+		if err != nil {
+			println(err.Error())
+			cType = "string"
+		} else {
+			cType = "time.Time"
+		}
 	}
 
 	return cType
 }
 
 func evalVal(value interface{}) string {
-	test := reflect.ValueOf(value)
-
-	pointsTo := reflect.Indirect(test)
+	pointsTo := reflect.Indirect(reflect.ValueOf(value))
 
 	return fmt.Sprintf("%v", pointsTo)
 }
