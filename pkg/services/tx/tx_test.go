@@ -40,20 +40,9 @@ func TestDatabase_QueryRow(t *testing.T) {
 
 	// Row 1
 	assert.NoError(t, err)
-	assert.Equal(t, "id", resRow.Columns[0].Name)
-	assert.Equal(t, "1", resRow.Columns[0].Value)
-	assert.Equal(t, "int64", resRow.Columns[0].Type)
-	assert.Equal(t, "name", resRow.Columns[1].Name)
-	assert.Equal(t, "test1", resRow.Columns[1].Value)
-	assert.Equal(t, "string", resRow.Columns[1].Type)
-	assert.Equal(t, "date", resRow.Columns[2].Name)
-	// due to times having the chance of being off by a matter of milliseconds,
-	// we wont worry about testing with the default time format. However,
-	// this would be a good example of testing a date returned, as long as the
-	// value passed in where time.Now() is passed is the same format
-	// ass the time format you're using
-	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0].Columns[2].Value)
-	assert.Equal(t, "time.Time", resRow.Columns[2].Type)
+	assert.Equal(t, "id", resRow[0].Columns[0].Name)
+	assert.Equal(t, "1", resRow[0].Columns[0].Value)
+	assert.Equal(t, "int64", resRow[0].Columns[0].Type)
 }
 
 func TestDatabase_QueryRowWithContext(t *testing.T) {
@@ -80,20 +69,9 @@ func TestDatabase_QueryRowWithContext(t *testing.T) {
 
 	// Row 1
 	assert.NoError(t, err)
-	assert.Equal(t, "id", resRow.Columns[0].Name)
-	assert.Equal(t, "1", resRow.Columns[0].Value)
-	assert.Equal(t, "int64", resRow.Columns[0].Type)
-	assert.Equal(t, "name", resRow.Columns[1].Name)
-	assert.Equal(t, "test1", resRow.Columns[1].Value)
-	assert.Equal(t, "string", resRow.Columns[1].Type)
-	assert.Equal(t, "date", resRow.Columns[2].Name)
-	// due to times having the chance of being off by a matter of milliseconds,
-	// we wont worry about testing with the default time format. However,
-	// this would be a good example of testing a date returned, as long as the
-	// value passed in where time.Now() is passed is the same format
-	// ass the time format you're using
-	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0].Columns[2].Value)
-	assert.Equal(t, "time.Time", resRow.Columns[2].Type)
+	assert.Equal(t, "id", resRow[0].Columns[0].Name)
+	assert.Equal(t, "1", resRow[0].Columns[0].Value)
+	assert.Equal(t, "int64", resRow[0].Columns[0].Type)
 }
 
 func TestDatabase_Query(t *testing.T) {

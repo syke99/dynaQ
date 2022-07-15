@@ -50,6 +50,13 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 		res.Columns[columnName] = dummyRes
 	}
 
+	// this is used to reduce the amount of times
+	// evalType gets called on a column to only
+	// once per column, per query. This keeps
+	// reflection calls to an absolute minimum,
+	// thus reducing negative performance creep
+	rowCounter := 0
+
 	for rows.Next() {
 		for i := range columnNames {
 			res.ColumnNames[i] = columnNames[i]
@@ -70,7 +77,7 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 		// rslt.columnValues, which was synchronized with rslt.columnNames above
 		for i := range valuePointers {
 			colVal := evalVal(values[i])
-			if i < len(valuePointers) {
+			if rowCounter < 1 {
 				colType := evalType(timeFormat, colVal, values[i])
 
 				columnTypesSlice[i] = colType
@@ -89,6 +96,7 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 			rowResults.Columns[i] = qr
 		}
 
+		rowCounter++
 		results = append(results, rowResults)
 	}
 
