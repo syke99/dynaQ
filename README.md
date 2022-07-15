@@ -52,7 +52,6 @@ func main() {
     // after creating a dynamic querier, just pass in whatever
     // query string you want, and whatever variable amouont of query
     // arguments you need.
-    // you can query for multiple rows, or just one row at once
     //    
     // testTable:
     // __| id | name | cost | available |   created-date   |__
@@ -65,42 +64,13 @@ func main() {
     //   |  6 |  kl  | 4.45 |   false   | 2019-01-19 10:14 |
     //   |  7 |  mn  | 2.99 |   false   | 2019-02-11 06:22 |
     //
-    // single row:
-    row, err := dq.DatabaseQueryRow("select * from testTable where id in (@p1, @p2, @p3, @p4)", 1, 2, 4, 7)
-    if err != nil {
-	    panic(err)
-    }
-    
-    
-    fmt.Println("-----------------")
-    // a dynaQ column holds the type in field
-    // <columnVariable>.Type for easy type
-    // assertion later on
-    newColumn := true
-    for newColumn {
-    	     if ok, row := row.NextColumn(); !ok {
-    		    newColumn = false
-    	     }
-	     fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
-    }
-    fmt.Println("-----------------")
-    //
-    // this will output:
-    // -----------------
-    // column: id, value: 1 (type: int64)
-    // column: name, value: ab (type: string)
-    // column: cost, value: 2.10 (type: float64)
-    // column: available, value: true (type: bool)
-    // column: created-date, value: 2018-01-18 05:43 (type: time.Time)
-    // -----------------
-	
-	
-    // multiple rows:
+    // Query the database
     rows, err := dq.DatabaseQuery("select * from testTable where id in (@p1, @p2, @p3, @p4)", 1, 2, 4, 7)
     if err != nil {
         panic(err)
     }
     
+    // create a boolean to keep track of whether or not there's a new row to be checked
     newRow := true
 	
     fmt.Println("-----------------")
@@ -115,6 +85,7 @@ func main() {
     	}
     	fmt.Println(fmt.Sprintf("row: %d", row.CurrentRow))
     	fmt.Println("-----------------")
+    	// create a boolean to keep track of whether or not there's a new column to be checked
 	newColumn := true
 	for newColumn {
 		if ok, column := row.NextColumn(); !ok {
