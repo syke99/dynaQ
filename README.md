@@ -76,7 +76,11 @@ func main() {
     // a dynaQ column holds the type in field
     // <columnVariable>.Type for easy type
     // assertion later on
-    for _, column := range row {
+    newColumn := true
+    for newColumn {
+    	     if ok, row := row.NextColumn(); !ok {
+    		    newColumn = false
+    	     }
 	     fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
     }
     fmt.Println("-----------------")
@@ -111,7 +115,11 @@ func main() {
     	}
     	fmt.Println(fmt.Sprintf("row: %d", row.CurrentRow))
     	fmt.Println("-----------------")
-	for _, column := range row {
+	newColumn := true
+	for newColumn {
+		if ok, column := row.NextColumn(); !ok {
+			newColumn = false
+		}
             	fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
         }
 	rowNumber++
