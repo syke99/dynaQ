@@ -7,16 +7,19 @@ import (
 	"github.com/syke99/dynaQ/pkg/resources/models"
 )
 
+// Connection provides a dynamic querier on a single database connection
 type Connection struct{}
 
 type service interface {
 	QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
 }
 
+// NewConnectionService creates a new Connection with its associated service method(s)
 func NewConnectionService() service {
 	return Connection{}
 }
 
+// QueryWithContext is a Connection service method to execute a dynamic query, with a context, on a single database connection
 func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}

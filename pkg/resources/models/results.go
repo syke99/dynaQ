@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Result is used during unmarshaling
 type Result struct {
 	Columns      map[string]ColumnValue
 	ColumnValues []interface{}
@@ -12,26 +13,14 @@ type Result struct {
 	ColumnTypes  []string
 }
 
-type SingleRowResult struct {
-	Result Row
-}
-
-func (s SingleRowResult) Row() Row {
-	return s.Result
-}
-
-func (s SingleRowResult) Unmarshal(dest *interface{}) {
-	marshaled, _ := json.Marshal(s.Row())
-
-	json.Unmarshal(marshaled, dest)
-}
-
-type MultiRowResult struct {
+// ResultRows represents all the rows of the result set returned by a query
+type ResultRows struct {
 	CurrentRow int
 	Results    []Row
 }
 
-func (m MultiRowResult) NextRow() (bool, Row) {
+// NextRow returns the next Row in the result set, preceded by a boolean to denote whether there are any subsequent rows following the one returned by this method
+func (m ResultRows) NextRow() (bool, Row) {
 	if m.CurrentRow > len(m.Results) {
 		var dud Row
 		return false, dud
@@ -41,7 +30,8 @@ func (m MultiRowResult) NextRow() (bool, Row) {
 	return true, m.Results[m.CurrentRow-1]
 }
 
-func (m MultiRowResult) Unmarshal(dest *interface{}) {
+// Unmarshal takes a pointer to an empty interface as an argument for unmarshaling results into a stringified json object; if dest isn't an empty interface, this method will fail and return an error
+func (m ResultRows) Unmarshal(dest *interface{}) error {
 	var jsonMap map[string]Row
 
 	for i, row := range m.Results {
@@ -50,5 +40,5 @@ func (m MultiRowResult) Unmarshal(dest *interface{}) {
 
 	marshalled, _ := json.Marshal(jsonMap)
 
-	json.Unmarshal(marshalled, dest)
+	return json.Unmarshal(marshalled, dest)
 }
