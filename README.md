@@ -4,7 +4,7 @@
 [![go reportcard](https://goreportcard.com/badge/github.com/syke99/dynaQ)](https://goreportcard.com/report/github.com/syke99/dynaQ)
 [![License](https://img.shields.io/github/license/syke99/dynaQ)](https://github.com/syke99/dynaQ/blob/master/LICENSE)
 ![Go version](https://img.shields.io/github/go-mod/go-version/syke99/dynaQ)</br>
-An extension for Go's sql package in the standard library to support dynamic queries directly from the database, as well as on database connections, prepared statements and transactions
+An extension for Go's sql package in the standard library to support dynamic queries from the database, as well as on database connections instead of a set of connection pools
 
 
 How do I use dynaQ?
