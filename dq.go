@@ -3,6 +3,7 @@ package dynaQ
 import (
 	"context"
 	"database/sql"
+
 	"github.com/syke99/dynaQ/internal"
 	"github.com/syke99/dynaQ/pkg/resources/models"
 	"github.com/syke99/dynaQ/pkg/resources/timeFmt"
@@ -10,16 +11,18 @@ import (
 	dbServ "github.com/syke99/dynaQ/pkg/services/db"
 )
 
+// DynaQ is the base dynamic querier
 type DynaQ struct {
 	db         *sql.DB
-	stmnt      *sql.Stmt
-	tx         *sql.Tx
 	conn       *sql.Conn
 	timeFormat string
 	dbService  dbServ.DataBase
 	conService conServ.Connection
 }
 
+// NewDynaQ returns a new dynamic querier with the provided configurations. The user must pass in a created database connection, but can optionally configure the time format for dynaQ to use whenver
+// analyzing column values to determine strings vs times by passing in the desired time format or by either passing in an empty string or importing dynaQ/pkg/resources/timeFmt and passing in
+// timeFmt.DefaultTimeFormat
 func NewDynaQ(db *sql.DB, timeFormat string) DynaQ {
 	dbService := dbServ.NewDbService()
 	var tmFmt string
@@ -38,6 +41,7 @@ func NewDynaQ(db *sql.DB, timeFormat string) DynaQ {
 	}
 }
 
+// NewDqConn allows your dynamic querier to make dynamic queries on a specific database connection
 func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
 	conService := conServ.NewConnectionService()
 
@@ -47,9 +51,11 @@ func (dq DynaQ) NewDqConn(con *sql.Conn) DynaQ {
 	return dq
 }
 
-func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRowResult, error) {
+// DatabaseQuery takes the query the user wishes to execute, along with any arguments required as arguments and executes the query against the database instance. It then returns a
+// models.ResultRows holding all the rows of the result set returned by the query executed
+func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.ResultRows, error) {
 	var dud []models.Row
-	rows := models.MultiRowResult{
+	rows := models.ResultRows{
 		CurrentRow: 1,
 		Results:    dud,
 	}
@@ -66,9 +72,11 @@ func (dq DynaQ) DatabaseQuery(query string, args ...interface{}) (models.MultiRo
 	return rows, nil
 }
 
-func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
+// DatabaseQueryContext takes the specific context, query the user wishes to execute, and any arguments required as arguments and executes the query against a database instance. It then returns a
+// models.ResultRows holding all the rows of the result set returned by the query executed
+func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...interface{}) (models.ResultRows, error) {
 	var dud []models.Row
-	rows := models.MultiRowResult{
+	rows := models.ResultRows{
 		CurrentRow: 1,
 		Results:    dud,
 	}
@@ -85,9 +93,11 @@ func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...
 	return rows, nil
 }
 
-func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (models.MultiRowResult, error) {
+// ConnectionQueryContext takes the specific context, query the user wishes to execute, and any arguments required as arguments and executes the query against the specific database connection.
+// It then returns a models.ResultRows holding all the rows of the result set returned by the query executed
+func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (models.ResultRows, error) {
 	var dud []models.Row
-	rows := models.MultiRowResult{
+	rows := models.ResultRows{
 		CurrentRow: 1,
 		Results:    dud,
 	}

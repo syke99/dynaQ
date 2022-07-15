@@ -2,11 +2,11 @@ package conn
 
 import (
 	"context"
-	"github.com/syke99/dynaQ/internal"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/syke99/dynaQ/internal"
 )
 
 func TestNewConnectionService(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"github.com/syke99/dynaQ/pkg/resources/models"
 )
 
+// DataBase provides a dynamic querier on an instance of a database
 type DataBase struct{}
 
 type service interface {
@@ -14,10 +15,12 @@ type service interface {
 	QueryWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
 }
 
+// NewDbService creates a new DataBase with its associated service method(s)
 func NewDbService() service {
 	return DataBase{}
 }
 
+// Query is a DataBase service method to execute a dynamic query on an instance of a database
 func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
@@ -51,6 +54,7 @@ func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryPa
 	return unmarshalled, nil
 }
 
+// QueryWithContext is a DataBase service method to execute a dynamic query, with a context, on an instance of a database
 func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
