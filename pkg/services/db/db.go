@@ -12,8 +12,8 @@ type DataBase struct{}
 type service interface {
 	Query(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
 	QueryWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
-	QueryRow(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
-	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error)
+	QueryRow(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
+	QueryRowWithContext(db *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
 }
 
 func NewDbService() service {
@@ -86,7 +86,7 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryRow(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error) {
+func (db DataBase) QueryRow(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -102,16 +102,16 @@ func (db DataBase) QueryRow(dBase *sql.DB, query string, timeFormat string, quer
 	// query the db with the dynamic query and it’s params
 	res, err := dBase.Query(query, queryParams.Args...)
 	if err != nil {
-		var dummyResults models.Row
+		var dummyResults []models.Row
 
 		return dummyResults, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
-		var dummyResults models.Row
+		var dummyResults []models.Row
 
 		return dummyResults, err
 	}
@@ -119,7 +119,7 @@ func (db DataBase) QueryRow(dBase *sql.DB, query string, timeFormat string, quer
 	return unmarshalled, nil
 }
 
-func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) (models.Row, error) {
+func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -135,16 +135,16 @@ func (db DataBase) QueryRowWithContext(dBase *sql.DB, ctx context.Context, query
 	// query the db with the dynamic query and it’s params
 	res, err := dBase.QueryContext(ctx, query, queryParams.Args...)
 	if err != nil {
-		var dummyResults models.Row
+		var dummyResults []models.Row
 
 		return dummyResults, err
 	}
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRow(&rslt, res, timeFormat)
+	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
 	if err != nil {
-		var dummyResults models.Row
+		var dummyResults []models.Row
 
 		return dummyResults, err
 	}

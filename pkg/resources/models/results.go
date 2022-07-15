@@ -12,26 +12,12 @@ type Result struct {
 	ColumnTypes  []string
 }
 
-type SingleRowResult struct {
-	Result Row
-}
-
-func (s SingleRowResult) Row() Row {
-	return s.Result
-}
-
-func (s SingleRowResult) Unmarshal(dest *interface{}) {
-	marshaled, _ := json.Marshal(s.Row())
-
-	json.Unmarshal(marshaled, dest)
-}
-
-type MultiRowResult struct {
+type ResultRows struct {
 	CurrentRow int
 	Results    []Row
 }
 
-func (m MultiRowResult) NextRow() (bool, Row) {
+func (m *ResultRows) NextRow() (bool, Row) {
 	if m.CurrentRow > len(m.Results) {
 		var dud Row
 		return false, dud
@@ -41,7 +27,7 @@ func (m MultiRowResult) NextRow() (bool, Row) {
 	return true, m.Results[m.CurrentRow-1]
 }
 
-func (m MultiRowResult) Unmarshal(dest *interface{}) {
+func (m *ResultRows) Unmarshal(dest *interface{}) {
 	var jsonMap map[string]Row
 
 	for i, row := range m.Results {
