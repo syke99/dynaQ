@@ -3,6 +3,7 @@ package conn
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/syke99/dynaQ/internal"
 	"github.com/syke99/dynaQ/pkg/resources/models"
 )
@@ -21,6 +22,12 @@ func NewConnectionService() service {
 
 // QueryWithContext is a Connection service method to execute a dynamic query, with a context, on a single database connection
 func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
+	if conn == nil {
+		var dummyResults []models.Row
+
+		return dummyResults, errors.New("no database connection provided")
+	}
+
 	var columnMap map[string]models.ColumnValue
 	var columnValuesSlice []interface{}
 	var columnNamesSlice []string
@@ -43,12 +50,7 @@ func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query 
 
 	defer res.Close()
 
-	unmarshalled, err := internal.UnmarshalRows(&rslt, res, timeFormat)
-	if err != nil {
-		var dummyResults []models.Row
-
-		return dummyResults, err
-	}
+	unmarshalled := internal.UnmarshalRows(&rslt, res, timeFormat)
 
 	return unmarshalled, nil
 }

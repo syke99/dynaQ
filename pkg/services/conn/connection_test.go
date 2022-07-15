@@ -95,3 +95,52 @@ func TestConnection_QueryWithContext(t *testing.T) {
 	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0].Columns[2].Value)
 	assert.Equal(t, "time.Time", resRows[2].Columns[2].Type)
 }
+
+func TestConnection_QueryWithContext_NoContext(t *testing.T) {
+	// Arrange
+	testQuery := "SELECT * FROM testing"
+
+	connService := NewConnectionService()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
+		AddRow(1, "test1", "2018-01-20 04:35").
+		AddRow("2", "test2", "2018-01-20 04:35").
+		AddRow(1.1, "test3", "2018-01-20 04:35")
+
+	_, mock, _ := sqlmock.New()
+	mock.ExpectQuery("SELECT (.*) FROM").
+		WillReturnRows(rows)
+
+	// Act
+	dummyQueryArgs := internal.QueryArgs{}
+
+	_, err := connService.QueryWithContext(nil, context.Background(), testQuery, "2006-01-02 15:04", dummyQueryArgs)
+
+	// Assert
+	assert.Error(t, err)
+}
+
+func TestConnection_QueryWithContext_BadQuery(t *testing.T) {
+	// Arrange
+
+	connService := NewConnectionService()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
+		AddRow(1, "test1", "2018-01-20 04:35").
+		AddRow("2", "test2", "2018-01-20 04:35").
+		AddRow(1.1, "test3", "2018-01-20 04:35")
+
+	db, mock, _ := sqlmock.New()
+	mock.ExpectQuery("SELECT (.*) FROM").
+		WillReturnRows(rows)
+
+	// Act
+	con, err := db.Conn(context.Background())
+
+	dummyQueryArgs := internal.QueryArgs{}
+
+	_, err = connService.QueryWithContext(con, context.Background(), "", "2006-01-02 15:04", dummyQueryArgs)
+
+	// Assert
+	assert.Error(t, err)
+}
