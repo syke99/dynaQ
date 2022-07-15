@@ -93,7 +93,6 @@ func main() {
 		}
             	fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
         }
-	rowNumber++
 	fmt.Println("-----------------")
     }
     
