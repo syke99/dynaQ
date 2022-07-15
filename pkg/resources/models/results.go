@@ -27,14 +27,14 @@ func (m *ResultRows) NextRow() (bool, Row) {
 	return true, m.Results[m.CurrentRow-1]
 }
 
-func (m *ResultRows) Unmarshal(dest *interface{}) {
+func (m *ResultRows) Unmarshal(dest *interface{}) error {
 	var jsonMap map[string]Row
 
 	for i, row := range m.Results {
-		jsonMap[fmt.Sprintf("result-%d", i)] = row
+		jsonMap[fmt.Sprintf("row-%d", i)] = row
 	}
 
 	marshalled, _ := json.Marshal(jsonMap)
 
-	json.Unmarshal(marshalled, dest)
+	return json.Unmarshal(marshalled, dest)
 }
