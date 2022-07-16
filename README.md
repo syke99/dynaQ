@@ -136,9 +136,8 @@ func main() {
 
 ### Connections, Transactions, and PreparedStatements
 
-dynaQ also allows for using dynamic queries on database connections, database transactions, and prepared statements
-after creating your dynamic querier with `dynaQ.NewDynaQ(db *sql.DB)`, you can call `NewDqConn(conn *sql.Conn)`,
-`NewDqTransaction(tx *sql.Tx)`, or `NewDqPreparedStatement(query string)` respectively before querying
+dynaQ also allows for using dynamic queries on database connections. After creating your dynamic querier with `dynaQ.NewDynaQ(db *sql.DB)`,
+you can call `NewDqConn(conn *sql.Conn)` before querying to query on a specific database connection
 
 ### dynaQ Usage Ideas
 
