@@ -23,31 +23,7 @@ func NewDbService() service {
 
 // Query is a DataBase service method to execute a dynamic query on an instance of a database
 func (db DataBase) Query(dBase *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error) {
-	var columnMap map[string]models.ColumnValue
-	var columnValuesSlice []interface{}
-	var columnNamesSlice []string
-	var columnTypesSlice []string
-
-	rslt := models.Result{
-		Columns:      columnMap,
-		ColumnValues: columnValuesSlice,
-		ColumnNames:  columnNamesSlice,
-		ColumnTypes:  columnTypesSlice,
-	}
-
-	// query the db with the dynamic query and it’s params
-	res, err := dBase.Query(query, queryParams.Args...)
-	if err != nil {
-		var dummyResults []models.Row
-
-		return dummyResults, err
-	}
-
-	defer res.Close()
-
-	unmarshalled := internal.UnmarshalRows(&rslt, res, timeFormat)
-
-	return unmarshalled, nil
+	return internal.DatabaseQuery(dBase, query, timeFormat, queryParams)
 }
 
 // QueryWithContext is a DataBase service method to execute a dynamic query, with a context, on an instance of a database
@@ -58,29 +34,5 @@ func (db DataBase) QueryWithContext(dBase *sql.DB, ctx context.Context, query st
 		return dummyResults, errors.New("no database instance provided")
 	}
 
-	var columnMap map[string]models.ColumnValue
-	var columnValuesSlice []interface{}
-	var columnNamesSlice []string
-	var columnTypesSlice []string
-
-	rslt := models.Result{
-		Columns:      columnMap,
-		ColumnValues: columnValuesSlice,
-		ColumnNames:  columnNamesSlice,
-		ColumnTypes:  columnTypesSlice,
-	}
-
-	// query the db with the dynamic query and it’s params
-	res, err := dBase.QueryContext(ctx, query, queryParams.Args...)
-	if err != nil {
-		var dummyResults []models.Row
-
-		return dummyResults, err
-	}
-
-	defer res.Close()
-
-	unmarshalled := internal.UnmarshalRows(&rslt, res, timeFormat)
-
-	return unmarshalled, nil
+	return internal.DatabaseQueryWithContext(dBase, ctx, query, timeFormat, queryParams)
 }

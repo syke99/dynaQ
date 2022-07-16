@@ -28,29 +28,5 @@ func (c Connection) QueryWithContext(conn *sql.Conn, ctx context.Context, query 
 		return dummyResults, errors.New("no database connection provided")
 	}
 
-	var columnMap map[string]models.ColumnValue
-	var columnValuesSlice []interface{}
-	var columnNamesSlice []string
-	var columnTypesSlice []string
-
-	rslt := models.Result{
-		Columns:      columnMap,
-		ColumnValues: columnValuesSlice,
-		ColumnNames:  columnNamesSlice,
-		ColumnTypes:  columnTypesSlice,
-	}
-
-	// query the db with the dynamic query and it’s params
-	res, err := conn.QueryContext(ctx, query, queryParams.Args...)
-	if err != nil {
-		var dummyResults []models.Row
-
-		return dummyResults, err
-	}
-
-	defer res.Close()
-
-	unmarshalled := internal.UnmarshalRows(&rslt, res, timeFormat)
-
-	return unmarshalled, nil
+	return internal.ConnectionQueryWithContext(conn, ctx, query, timeFormat, queryParams)
 }
