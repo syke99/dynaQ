@@ -9,7 +9,7 @@ import (
 	"github.com/syke99/dynaQ/pkg/resources/models"
 )
 
-func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]models.Row, error) {
+func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) []models.Row {
 	var results []models.Row
 
 	// grab the column names from the result to later create an entry for each in result.Rows
@@ -57,10 +57,7 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 			valuePointers[i] = &values[i]
 		}
 		// scans all values into a slice of interfaces of any size
-		err := rows.Scan(valuePointers...)
-		if err != nil {
-			return results, err
-		}
+		rows.Scan(valuePointers...)
 
 		columns := make([]models.ColumnValue, len(values))
 
@@ -93,7 +90,7 @@ func UnmarshalRows(res *models.Result, rows *sql.Rows, timeFormat string) ([]mod
 		results = append(results, rowResults)
 	}
 
-	return results, nil
+	return results
 }
 
 func evalType(timeFormat string, colVal string, value interface{}) string {

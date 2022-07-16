@@ -93,6 +93,29 @@ func TestDatabase_Query(t *testing.T) {
 	assert.Equal(t, "time.Time", resRows[2].Columns[2].Type)
 }
 
+func TestDatabase_Query_BadQuery(t *testing.T) {
+	// Arrange
+
+	dbService := NewDbService()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
+		AddRow(1, "test1", "2018-01-20 04:35").
+		AddRow("2", "test2", "2018-01-20 04:35").
+		AddRow(1.1, "test3", "2018-01-20 04:35")
+
+	db, mock, _ := sqlmock.New()
+	mock.ExpectQuery("SELECT (.*) FROM").
+		WillReturnRows(rows)
+
+	dummyQueryArgs := internal.QueryArgs{}
+
+	// Act
+	_, err := dbService.Query(db, "", "2006-01-02 15:04", dummyQueryArgs)
+
+	// Assert
+	assert.Error(t, err)
+}
+
 func TestDatabase_QueryWithContext(t *testing.T) {
 	// Arrange
 	testQuery := "SELECT * FROM testing"
@@ -168,4 +191,54 @@ func TestDatabase_QueryWithContext(t *testing.T) {
 	// ass the time format you're using
 	// assert.Equal(t, fmt.Sprintf("%v", time.Now()), resRows[0].Columns[2].Value)
 	assert.Equal(t, "time.Time", resRows[2].Columns[2].Type)
+}
+
+func TestDatabase_QueryWithContext_NoDatabase(t *testing.T) {
+	// Arrange
+	testQuery := "SELECT * FROM testing"
+
+	dbService := NewDbService()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
+		AddRow(1, "test1", "2018-01-20 04:35").
+		AddRow("2", "test2", "2018-01-20 04:35").
+		AddRow(1.1, "test3", "2018-01-20 04:35")
+
+	_, mock, _ := sqlmock.New()
+	mock.ExpectQuery("SELECT (.*) FROM").
+		WillReturnRows(rows)
+
+	dummyQueryArgs := internal.QueryArgs{}
+
+	// Act
+	_, err := dbService.QueryWithContext(nil, context.Background(), testQuery, "2006-01-02 15:04", dummyQueryArgs)
+
+	// Assert
+
+	// Row 1
+	assert.Error(t, err)
+}
+
+func TestDatabase_QueryWithContext_BadQuery(t *testing.T) {
+	// Arrange
+	dbService := NewDbService()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "date"}).
+		AddRow(1, "test1", "2018-01-20 04:35").
+		AddRow("2", "test2", "2018-01-20 04:35").
+		AddRow(1.1, "test3", "2018-01-20 04:35")
+
+	db, mock, _ := sqlmock.New()
+	mock.ExpectQuery("SELECT (.*) FROM").
+		WillReturnRows(rows)
+
+	dummyQueryArgs := internal.QueryArgs{}
+
+	// Act
+	_, err := dbService.QueryWithContext(db, context.Background(), "", "2006-01-02 15:04", dummyQueryArgs)
+
+	// Assert
+
+	// Row 1
+	assert.Error(t, err)
 }
