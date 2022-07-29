@@ -46,12 +46,7 @@ func main() {
     }
     defer db.Close()
     
-    // create a new dynamic querier with your database instance,
-    // you can either pass in your own time format to match the
-    // format of time values stored in your database, or if they
-    // match the format "2006-01-02 15:04", you can pass in ""
-    // and dynaQ will default to that format
-    dq := dynaQ.NewDynaQ(db, "")
+    dq := dynaQ.NewDynaQ(db)
     
     // after creating a dynamic querier, just pass in whatever
     // query string you want, and whatever variable amouont of query
