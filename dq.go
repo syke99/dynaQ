@@ -21,6 +21,7 @@ type DynaQ struct {
 	conService    conServ.Connection
 }
 
+// DynaQOptions are options for configuring a dynamic querier
 type DynaQOptions func(*DynaQ)
 
 // WithTimeFormat allows for setting the time format to check for in database values to something other than the Default Time Format "2006-01-02 15:04"
@@ -30,8 +31,8 @@ func WithTimeFormat(timeFormat string) DynaQOptions {
 	}
 }
 
-// WithConnectionAutoClose allows for setting the automatic closing of a connection after a query is executed, if desired. By default, DynaQ does not
-// automatically close individual database connections
+// WithConnectionAutoClose allows for setting the automatic closing of any and all connections on this dynamic queriers after a query is executed,
+// if desired. By default, DynaQ does not automatically close individual database connections
 func WithConnectionAutoClose() DynaQOptions {
 	return func(dq *DynaQ) {
 		dq.connAutoClose = true
