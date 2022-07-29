@@ -9,7 +9,9 @@ import (
 )
 
 // DataBase provides a dynamic querier on an instance of a database
-type DataBase struct{}
+type DataBase struct {
+	service
+}
 
 type service interface {
 	Query(db *sql.DB, query string, timeFormat string, queryParams internal.QueryArgs) ([]models.Row, error)
@@ -17,7 +19,7 @@ type service interface {
 }
 
 // NewDbService creates a new DataBase with its associated service method(s)
-func NewDbService() service {
+func NewDbService() DataBase {
 	return DataBase{}
 }
 
