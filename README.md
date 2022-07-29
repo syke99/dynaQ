@@ -1,4 +1,8 @@
-![dynaQ logo](https://github.com/syke99/images/blob/main/dynaQ.png?raw=true)
+<p align="center">
+  <img 
+    src="https://github.com/syke99/images/blob/main/dynaQ.png?raw=true"
+  >
+</p>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/syke99/dynaQ.svg)](https://pkg.go.dev/github.com/syke99/dynaQ)
 [![go reportcard](https://goreportcard.com/badge/github.com/syke99/dynaQ)](https://goreportcard.com/report/github.com/syke99/dynaQ)
