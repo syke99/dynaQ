@@ -13,11 +13,12 @@ import (
 
 // DynaQ is the base dynamic querier
 type DynaQ struct {
-	db         *sql.DB
-	conn       *sql.Conn
-	timeFormat string
-	dbService  dbServ.DataBase
-	conService conServ.Connection
+	db            *sql.DB
+	conn          *sql.Conn
+	connAutoClose bool
+	timeFormat    string
+	dbService     dbServ.DataBase
+	conService    conServ.Connection
 }
 
 type DynaQOptions func(*DynaQ)
@@ -29,16 +30,28 @@ func WithTimeFormat(timeFormat string) DynaQOptions {
 	}
 }
 
+// WithConnectionAutoClose allows for setting the automatic closing of a connection after a query is executed, if desired. By default, DynaQ does not
+// automatically close individual database connections
+func WithConnectionAutoClose() DynaQOptions {
+	return func(dq *DynaQ) {
+		dq.connAutoClose = true
+	}
+}
+
 // NewDynaQ returns a new dynamic querier with the provided configurations. The user must pass in a created database connection, but can be optionally configured
 // with different options using the provided pre-defined DynaQOptions
 func NewDynaQ(db *sql.DB, opts ...DynaQOptions) DynaQ {
 	dbService := dbServ.NewDbService()
 
+	dummyConn, _ := db.Conn(context.Background())
+
 	dq := &DynaQ{
-		db:         db,
-		timeFormat: timeFmt.DefaultTimeFormat,
-		dbService:  dbService,
-		conService: conServ.Connection{},
+		db:            db,
+		conn:          dummyConn,
+		connAutoClose: false,
+		timeFormat:    timeFmt.DefaultTimeFormat,
+		dbService:     dbService,
+		conService:    conServ.Connection{},
 	}
 
 	for _, opt := range opts {
@@ -104,6 +117,10 @@ func (dq DynaQ) DatabaseQueryContext(ctx context.Context, query string, args ...
 // It then returns a models.ResultRows holding all the rows of the result set returned by the query executed. ConnectionQuery uses context.Background() by default.
 // To use a specific context, use DynaQ.ConnectionQueryContext(ctx context.Context, query string, args ...interface{})
 func (dq DynaQ) ConnectionQuery(query string, args ...interface{}) (models.ResultRows, error) {
+	if dq.connAutoClose {
+		defer dq.conn.Close()
+	}
+
 	var dud []models.Row
 	rows := models.ResultRows{
 		CurrentRow: 1,
@@ -125,6 +142,10 @@ func (dq DynaQ) ConnectionQuery(query string, args ...interface{}) (models.Resul
 // ConnectionQueryContext takes the specific context, query the user wishes to execute, and any arguments required as arguments and executes the query against the specific database connection.
 // It then returns a models.ResultRows holding all the rows of the result set returned by the query executed
 func (dq DynaQ) ConnectionQueryContext(ctx context.Context, query string, args ...interface{}) (models.ResultRows, error) {
+	if dq.connAutoClose {
+		defer dq.conn.Close()
+	}
+
 	var dud []models.Row
 	rows := models.ResultRows{
 		CurrentRow: 1,
