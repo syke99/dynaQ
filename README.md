@@ -90,7 +90,7 @@ func main() {
 		if ok, column := row.NextColumn(); !ok {
 			newColumn = false
 		}
-            	fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, fmt.Sprintf("%v", column.Value), column.Type))
+            	fmt.Println(fmt.Sprintf("column: %s, value: %v (type: %s)", column.Name, column.Value, column.Type))
         }
 	fmt.Println("-----------------")
     }
