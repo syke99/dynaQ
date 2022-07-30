@@ -46,6 +46,9 @@ func main() {
     }
     defer db.Close()
     
+    // Create a new dynamic querier with your database instance. There are two option
+    // functions you can pass in as well to deviate from the default time format "2006-01-02 15:04",
+    // and/or to set all individual database connections to auto-close after querying
     dq := dynaQ.NewDynaQ(db)
     
     // after creating a dynamic querier, just pass in whatever
